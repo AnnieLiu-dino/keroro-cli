@@ -1,0 +1,25 @@
+{
+  "name": "@keroro-cli/core",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "AnneLiu <anne.liu0825@gmail.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "test": "node ./__tests__/core.test.js"
+  },
+  "dependencies": {
+    "@keroro-cli/utils": "^0.0.0"
+  }
+}
