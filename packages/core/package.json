@@ -1,6 +1,6 @@
 {
   "name": "@keroro-cli/core",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "> TODO: description",
   "author": "AnneLiu <anne.liu0825@gmail.com>",
   "homepage": "",
@@ -20,6 +20,6 @@
     "test": "node ./__tests__/core.test.js"
   },
   "dependencies": {
-    "@keroro-cli/utils": "^0.0.0"
+    "@keroro-cli/utils": "^0.0.1"
   }
 }
