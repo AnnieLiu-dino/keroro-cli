@@ -20,11 +20,15 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "scripts": {
-    "test": "node ./__tests__/core.test.js"
-  },
   "dependencies": {
-    "@keroro-cli/utils": "^0.0.2"
+    "colors": "^1.4.0",
+    "dotenv": "^16.4.7",
+    "import-local": "^3.2.0",
+    "npmlog": "^7.0.1",
+    "path-exists": "^4.0.0",
+    "root-check": "^1.0.0",
+    "semver": "^7.7.1",
+    "user-home": "^3.0.0"
   },
   "gitHead": "4aa78df128f1892b79f294760b3caf99a7265dab"
 }

@@ -4,8 +4,8 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {},
   "devDependencies": {
+    "@keroro-cli/core": "^0.0.2",
     "lerna": "^6.2.1"
   }
 }
