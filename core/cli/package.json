@@ -21,7 +21,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "@keroro-cli/log": "file:../../utils/log",
+    "@keroro-cli/npm-info": "file:../../utils/npm-info",
+    "@keroro-cli/init": "file:../../commands/init",
     "colors": "^1.4.0",
+    "commander": "^8.0.0",
     "dotenv": "^16.4.7",
     "import-local": "^3.2.0",
     "npmlog": "^7.0.1",

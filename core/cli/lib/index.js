@@ -9,20 +9,71 @@ const pkg = require("../package.json");
 const constant = require("./const");
 
 const log = require("@keroro-cli/log");
-
+const commander = require("commander");
 const semver = require("semver");
 const colors = require("colors/safe");
 const userHome = require("user-home");
 const pathExists = require("path-exists").sync;
 
-function enrty() {
+const program = new commander.Command();
+
+async function enrty() {
   try {
     checkPkgVersion();
     checkNodeVersion();
     checkRoot();
     checkUserHome();
+    checkEnv();
+    // await checkGlobalUpdate();
+    registerCommand();
   } catch (e) {
     log.error(e.message);
+  }
+}
+
+function registerCommand() {
+  const cliName = Object.keys(pkg.bin)[0];
+  program
+    .name(cliName)
+    .usage("<command> [options]")
+    .version(pkg.version)
+    .option("-D, --debug", "是否开启调试模式", false)
+    .option("-E, --env <envname>", "环境变量");
+
+  // <> 代表必填参数 []可选项
+  const clone = program.command("clone <source> [destination]");
+  clone
+    .option("-f, --force", "是否强制")
+    .option("-d, --debug", "是否强制")
+    .description("clone a repo")
+    .action((source, destination, options) => {
+      log.verbose("clone action:", source, destination, options);
+    });
+
+  // 监听debug事件
+  program.on("option:debug", function () {
+    // const options = program.opts();
+    const options = this.opts();
+    if (options.debug) {
+      process.env.LOG_LEVEL = "verbose";
+    } else {
+      process.env.LOG_LEVEL = "info";
+    }
+    log.level = process.env.LOG_LEVEL;
+  });
+
+  // 对未知命令的监听
+  program.on("command:*", (commands) => {
+    const availableCommands = program.commands.map((command) => command.name());
+    console.log(availableCommands);
+    console.error("found unknow command:", commands[0]);
+    program.outputHelp();
+  });
+
+  program.parse(process.argv);
+  // console.log(program);
+  if (program.args && program.args.length < 1) {
+    program.outputHelp();
   }
 }
 
@@ -65,7 +116,7 @@ function checkEnv() {
     // 之后通过可通过 process.env.XXX 访问
     dotenv.config({ path: envPath });
   } else {
-    // this.config = this.createDefaultConfig();
+    const config = createDefaultConfig();
   }
 }
 function createDefaultConfig() {
@@ -76,8 +127,27 @@ function createDefaultConfig() {
   process.env.CLI_ENV_PATH = cliEnvPath;
   return {
     home: userHome,
-    cliHome,
   };
+}
+
+async function checkGlobalUpdate() {
+  const { name, version } = pkg;
+  // 调取 npm API，获取所有版本号
+  const {
+    isLatestVersion,
+    getNpmLatestVersion,
+  } = require("@keroro-cli/npm-info");
+  // 提取所有版本号，比对那些版本号是大于当前版本号
+  const isLatest = await isLatestVersion(name, version);
+  if (!isLatest) {
+    const latestVersion = await getNpmLatestVersion(name, version);
+    log.warn(
+      colors.yellow(`
+        建议安装最新版本
+        npm install ${name}@^${latestVersion} -g
+        yarn global add ${name}@^${latestVersion}`)
+    );
+  }
 }
 
 module.exports = enrty;
