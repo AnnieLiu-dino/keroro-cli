@@ -1,7 +1,7 @@
 {
-  "name": "npm-info",
-  "version": "0.0.2",
-  "description": "> TODO: description",
+  "name": "@keroro-cli/dynamic-exec",
+  "version": "0.0.0",
+  "description": "动态执行命令",
   "author": "AnneLiu <anne.liu0825@gmail.com>",
   "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
   "license": "ISC",
@@ -13,20 +13,21 @@
   "files": [
     "lib"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmmirror.com/"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AnnieLiu-dino/keroro-cli.git"
   },
   "scripts": {
-    "test": "node ./__tests__/npm-info.test.js"
+    "test": "node ./__tests__/@keroro-cli/dynamic-exec.test.js"
   },
   "bugs": {
     "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
   },
   "dependencies": {
-    "@keroro/log": "file:../../log",
-    "axios": "^1.8.4",
-    "semver": "^7.7.1",
-    "url-join": "^4.0.1"
+    "@keroro-cli/package": "file:../../models/package",
+    "@keroro-cli/utils": "file:../../utils"
   }
 }

@@ -3,7 +3,7 @@
 const axios = require("axios");
 const urlJoin = require("url-join");
 const semver = require("semver");
-const log = require("@keroro-cli/log");
+const { log } = require("./log");
 
 async function getNpmInfo(npmName, registry) {
   if (!npmName) return null;

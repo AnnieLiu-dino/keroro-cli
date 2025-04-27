@@ -1,6 +1,6 @@
 {
-  "name": "@keroro-cli/log",
-  "version": "0.0.2",
+  "name": "@keroro-cli/package",
+  "version": "0.0.0",
   "description": "> TODO: description",
   "author": "AnneLiu <anne.liu0825@gmail.com>",
   "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -14,19 +14,22 @@
     "lib"
   ],
   "publishConfig": {
-    "access": "public"
+    "registry": "https://registry.npmmirror.com/"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AnnieLiu-dino/keroro-cli.git"
   },
   "scripts": {
-    "test": "node ./__tests__/@keroro-cli/log.test.js"
+    "test": "node ./__tests__/@keroro-cli/package.test.js"
   },
   "bugs": {
     "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
   },
   "dependencies": {
-    "npmlog": "^7.0.1"
+    "@keroro-cli/exec": "file:../../core/dynamic-exec",
+    "@keroro-cli/utils": "file:../../utils",
+    "npminstall": "^4.9.1",
+    "pkg-dir": "^5.0.0"
   }
 }

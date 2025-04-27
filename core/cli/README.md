@@ -1,11 +1,13 @@
-# `core`
+所有代码集成在 cli，命令多了以后，会 reduce the installing speed of cli
 
-> TODO: description
+命名规范
+全局变量：KERORO_CLI_XXXX
 
-## Usage
+KERORO_CLI_LOG_LEVEL
 
-```
-const core = require('core');
+KERORO_CLI_TARGET_PATH
 
-// TODO: DEMONSTRATE API
-```
+KERORO_CLI_ENV_FILENAME
+
+默认用户主目录 .env
+KERORO_CLI_ENV_PATH
