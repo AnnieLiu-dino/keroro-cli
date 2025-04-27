@@ -1,7 +1,11 @@
 {
   "name": "@keroro-cli/core",
   "version": "0.0.2",
-  "description": "> TODO: description",
+  "description": "entry file for keroro-cli",
+  "keywords": [
+    "cli",
+    "keroro"
+  ],
   "author": "AnneLiu <anne.liu0825@gmail.com>",
   "homepage": "",
   "license": "ISC",

@@ -1,0 +1,26 @@
+{
+  "name": "init",
+  "version": "0.0.2",
+  "description": "> TODO: description",
+  "author": "AnneLiu <anne.liu0825@gmail.com>",
+  "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnnieLiu-dino/keroro-cli.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/init.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
+  }
+}
