@@ -2,19 +2,18 @@
 
 const path = require("path");
 const child_process = require("child_process");
+const { log } = require("@keroro-cli/utils");
 
-const log = require("../../../utils/lib/log");
-const Package = require("@keroro-cli/package");
+const Package = require("../../package/lib");
 
 // 配置表：key: 命令名称，value: npm包名称
 const SETTING = {
-  clone: "@imooc-cli/init",
+  create: "@imooc-cli/init",
   // clone: "@keroro-cli/clone",
 };
 const CACHE_DIR = "dependencies/";
 
 async function exec() {
-  console.log(arguments);
   let targetPath = process.env.KERORO_CLI_TARGET_PATH;
   const envPath = process.env.KERORO_CLI_ENV_PATH;
   let storePath = "";
@@ -49,9 +48,9 @@ async function exec() {
     pkg = new Package({ targetPath, name: pkgName, version: pkgVersion });
   }
 
-  const entryFile = pkg.entryFilePath();
-  log.verbose("entryFile", entryFile);
-  if (entryFile) {
+  const entryFilePath = pkg.getEntryFilePath();
+  log.verbose("entryFilePath", entryFilePath);
+  if (entryFilePath) {
     try {
       // // 在当前进程中调用
       // // 将对象转数组 Array.from(arguments)
@@ -60,9 +59,13 @@ async function exec() {
 
       //使用多进程去执行
       const args = [commandName, this.opts()];
-      const exec_code = `require('${entryFile}').call(null, ${JSON.stringify(
+      log.verbose("args", args);
+      // 1. 先将命令行参数转成字符串
+      const exec_code = `require('${entryFilePath}').call(null, ${JSON.stringify(
         args
       )})`;
+      log.verbose("exec_code", exec_code);
+
       const child = spawn(exec_code, {
         cwd: process.cwd(),
         stdio: "inherit",

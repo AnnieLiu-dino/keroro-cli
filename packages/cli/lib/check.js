@@ -8,7 +8,7 @@ const pathExists = require("path-exists").sync;
 const colors = require("colors/safe");
 
 // 依赖的内部库
-const log = require("../../../utils/lib/log");
+const { log } = require("@keroro-cli/utils");
 
 // 变量区域
 const constant = require("./constant");

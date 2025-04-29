@@ -1,5 +1,5 @@
 const path = require("path");
-const log = require("../../../utils/lib/log");
+const { log } = require("@keroro-cli/utils");
 
 // 兼容window/mac的路径: 保证路径里都是 /
 function formatPath(_path) {

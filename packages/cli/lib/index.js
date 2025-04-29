@@ -13,7 +13,7 @@ const pathExists = require("path-exists").sync;
 
 const pkg = require("../package.json");
 const constant = require("./constant");
-const log = require("../../../utils/lib/log");
+const { log } = require("@keroro-cli/utils");
 const dynamicExec = require("@keroro-cli/dynamic-exec");
 
 const program = new commander.Command();
@@ -53,10 +53,10 @@ function registerCommand() {
     .option("-d, --debug", "是否开启调试模式", false)
     .option("-tp, --targetPath <targetPath>", "本地调试文件路径", "");
 
-  const clone = program.command("clone <projectName>");
+  const clone = program.command("create <projectName>");
   clone
     .option("-f, --force", "是否强制")
-    .description("clone a repo")
+    .description("create a project")
     .action(dynamicExec);
 
   // 监听全局参数:targetPath ->

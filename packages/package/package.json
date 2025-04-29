@@ -1,7 +1,7 @@
 {
-  "name": "@keroro-cli/utils",
+  "name": "@keroro-cli/package",
   "version": "0.0.0",
-  "description": "the tool pkg for keroro cli",
+  "description": "> TODO: description",
   "author": "AnneLiu <anne.liu0825@gmail.com>",
   "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
   "license": "ISC",
@@ -21,9 +21,15 @@
     "url": "git+https://github.com/AnnieLiu-dino/keroro-cli.git"
   },
   "scripts": {
-    "test": "node ./__tests__/@keroro-cli/utils.test.js"
+    "test": "node ./__tests__/@keroro-cli/package.test.js"
   },
   "bugs": {
     "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
+  },
+  "dependencies": {
+    "@keroro-cli/exec": "file:../dynamic-exec",
+    "@keroro-cli/utils": "file:../utils",
+    "npminstall": "^4.9.1",
+    "pkg-dir": "^5.0.0"
   }
 }

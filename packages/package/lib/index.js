@@ -6,7 +6,8 @@ const npminstall = require("npminstall");
 const pathExists = require("path-exists");
 const fsExtra = require("fs-extra");
 
-const log = require("../../../utils/lib/log");
+const { log } = require("@keroro-cli/utils");
+
 const {
   npmInfo: { getNpmLatestVersionNum, getDefaultRegistry },
 } = require("@keroro-cli/utils");
@@ -32,30 +33,34 @@ class Package {
     this.pkgName = name;
     this.pkgVersion = version;
   }
+  // 获取指定路径下 package.json中入口文件的地址
+  // eg: /.keroro-cli/dependencies/node_modules/XXXXX/lib/index.js
+  getRootFile(targetPath) {
+    // 1. 获取package.json所在目录
+    const dir = pkgDir(targetPath);
+    if (dir) {
+      // 2. 读取package.json
+      const pkgFile = require(path.resolve(dir, "package.json"));
+      // 3. 寻找main/lib
+      if (pkgFile && pkgFile.main) {
+        // 4. 路径的兼容(macOS/windows)
+        const entryFilePath = formatPath(path.resolve(dir, pkgFile.main));
+        log.verbose("entryFilePath", entryFilePath);
+        return entryFilePath;
+      }
+    }
+    return null;
+  }
 
   // 获取入口文件路径(逐层向上查找package.json所在层级)
   // targetPath路径下的入口文件（一般是 package.json 里面 "main" 指向的 js 文件）
-  entryFilePath() {
+  getEntryFilePath() {
     // 如果有缓存文件夹，就去缓存文件夹去找执行文件
     if (this.storePath) {
-      return _getRootFile(this.cacheFilePath);
+      return this.getRootFile(this.cacheFilePath);
     } else {
-      // 反之去找 指定文件夹中的入口文件
-      return _getRootFile(this.targetPath);
-    }
-    function _getRootFile(targetPath) {
-      // 1. 获取package.json所在目录
-      const dir = pkgDir(targetPath);
-      if (dir) {
-        // 2. 读取package.json
-        const pkgFile = require(path.resolve(dir, "package.json"));
-        // 3. 寻找main/lib
-        if (pkgFile && pkgFile.main) {
-          // 4. 路径的兼容(macOS/windows)
-          return formatPath(path.resolve(dir, pkgFile.main));
-        }
-      }
-      return null;
+      // 反之去找 指定文件夹中的入口文件, 进入本地调试模式
+      return this.getRootFile(this.targetPath);
     }
   }
 
@@ -73,6 +78,7 @@ class Package {
     return _p;
   }
 
+  // latest 转 具体版本号
   async prepare() {
     if (this.targetPath && !pathExists(this.targetPath)) {
       // mkdirp 是将路径上所有的文件都创建好
@@ -122,6 +128,7 @@ class Package {
 
   // 更新package
   async update() {
+    log.notice(`检查是否需要更新${this.pkgName}`);
     await this.prepare();
     // 判断最新版本是否存在
     // 1、查最新的版本号
@@ -132,15 +139,12 @@ class Package {
     if (!hasLatestPkg) {
       log.notice(`正在更新${this.pkgName}@${lastestVersion}`);
       await this.pureInstall(this.pkgName, lastestVersion);
-      this.pkgVersion = lastestVersion;
-    } else {
-      this.pkgVersion = lastestVersion;
     }
-    // 如果是最新的，什么都不需要弄
+    this.pkgVersion = lastestVersion;
   }
 
   async pureInstall(name, version) {
-    log.verbose("pureInstall", this.targetPath, this.storePath);
+    log.verbose("pureInstall", this.targetPath, this.storePath, name, version);
     return npminstall({
       // 模块路径
       root: this.targetPath,

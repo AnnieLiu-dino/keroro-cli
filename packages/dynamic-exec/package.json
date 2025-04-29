@@ -27,7 +27,7 @@
     "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
   },
   "dependencies": {
-    "@keroro-cli/package": "file:../../models/package",
-    "@keroro-cli/utils": "file:../../utils"
+    "@keroro-cli/package": "file:../package",
+    "@keroro-cli/utils": "file:../utils"
   }
 }
