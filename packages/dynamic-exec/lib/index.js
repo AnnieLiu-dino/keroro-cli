@@ -52,10 +52,11 @@ async function exec() {
   log.verbose("entryFilePath", entryFilePath);
   if (entryFilePath) {
     try {
-      // // 在当前进程中调用
+      // // 在当前进程中调用：无法充分利用cpu资源
       // // 将对象转数组 Array.from(arguments)
       // require(entryFile).call(null, Array.from(arguments))
-      // // 在node 子进程中调用
+
+      // 在node 子进程中调用，额外获得cpu资源
 
       //使用多进程去执行
       const args = [commandName, this.opts()];
@@ -65,18 +66,22 @@ async function exec() {
         args
       )})`;
       log.verbose("exec_code", exec_code);
+      log.verbose("cwd", process.cwd());
 
       const child = spawn(exec_code, {
         cwd: process.cwd(),
-        stdio: "inherit",
+        stdio: "inherit", // pipe inherit ignore 的区别
       });
+      // 2. 监听子进程的输出
       child.on("error", (e) => {
-        console.log(e.message);
+        log.error(e.message);
         // 结束
         process.exit(1);
       });
+      // 3. 退出事件
       child.on("exit", (code) => {
         log.verbose("命令执行结束", code);
+        process.exit(code);
       });
     } catch (e) {
       log.error(e.message);
@@ -84,14 +89,20 @@ async function exec() {
   }
 }
 
+// 兼容MAC和WINDOWS
 function spawn(exec_code, options) {
   const isWin32 = process.platform === "win32";
   const command = isWin32 ? "cmd" : "node";
   const comnArgs = ["-e", exec_code];
   const args = isWin32 ? ["/c"].concat(comnArgs) : comnArgs;
-  // 在window下应该是：child_process.spawn('cmd', ['/c', 'node','-e', exec_code], PS：window多个cmd的前缀
-  // 在Mac下： child_process.spawn('node', ['-e', exec_code]
-  log.verbose("执行命令：", command, args);
+  // window下：
+  // child_process.spawn('cmd', ['/c', 'node','-e', exec_code], PS：window多个cmd的前缀
+
+  // Mac下：
+  // child_process.spawn('node', ['-e', exec_code]
+  log.verbose("command", command);
+  log.verbose("args", args);
+  log.verbose("options", options);
   const child = child_process.spawn(command, args, {
     ...options,
   });

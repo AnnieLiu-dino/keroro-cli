@@ -65,7 +65,7 @@ class Check {
     const {
       isLatestVersion,
       getNpmLatestVersion,
-    } = require("@i18n-fe/get-npm-info");
+    } = require("@keroro-cli/get-npm-info");
     // 提取所有版本号，比对那些版本号是大于当前版本号
     const isLatest = await isLatestVersion(name, version);
     if (!isLatest) {

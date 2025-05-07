@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@keroro-cli/utils": "file:../utils",
-    "@keroro-cli/init": "file:../init",
+    "@keroro-cli/create": "file:../create",
     "@keroro-cli/dynamic-exec": "file:../dynamic-exec",
     "colors": "^1.4.0",
     "commander": "^8.0.0",
@@ -34,7 +34,7 @@
     "import-local": "^3.2.0",
     "path-exists": "^4.0.0",
     "root-check": "^1.0.0",
-    "semver": "^7.7.1",
+    "semver": "^7.3.5",
     "user-home": "^3.0.0"
   },
   "gitHead": "4aa78df128f1892b79f294760b3caf99a7265dab"

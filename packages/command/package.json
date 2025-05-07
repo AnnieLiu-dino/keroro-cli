@@ -1,6 +1,6 @@
 {
-  "name": "@keroro-cli/create",
-  "version": "0.0.0",
+  "name": "@keroro-cli/command",
+  "version": "0.0.2",
   "description": "> TODO: description",
   "author": "AnneLiu <anne.liu0825@gmail.com>",
   "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -21,14 +21,14 @@
     "url": "git+https://github.com/AnnieLiu-dino/keroro-cli.git"
   },
   "scripts": {
-    "test": "node ./__tests__/@keroro-cli/create.test.js"
+    "test": "node ./__tests__/@keroro-cli/command.test.js"
   },
   "bugs": {
     "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
   },
   "dependencies": {
-    "@keroro-cli/command": "file:../command",
-    "@keroro-cli/package": "file:../package",
-    "@keroro-cli/utils": "file:../utils"
+    "@keroro-cli/utils": "file:../utils",
+    "colors": "^1.4.0",
+    "semver": "^7.3.5"
   }
 }

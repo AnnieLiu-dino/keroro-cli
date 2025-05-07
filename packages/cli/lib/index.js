@@ -53,8 +53,8 @@ function registerCommand() {
     .option("-d, --debug", "是否开启调试模式", false)
     .option("-tp, --targetPath <targetPath>", "本地调试文件路径", "");
 
-  const clone = program.command("create <projectName>");
-  clone
+  const create = program.command("create <projectName>");
+  create
     .option("-f, --force", "是否强制")
     .description("create a project")
     .action(dynamicExec);
