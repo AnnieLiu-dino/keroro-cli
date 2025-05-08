@@ -4,7 +4,17 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "format": "prettier --write \"packages/**/*.{js,ts,jsx,tsx,json,md}\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx,json,md}": "prettier --write"
+  },
   "devDependencies": {
-    "lerna": "^6.6.2"
+    "husky": "^9.1.7",
+    "lerna": "^6.6.2",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.5.3"
   }
 }
