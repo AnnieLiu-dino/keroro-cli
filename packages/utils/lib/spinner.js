@@ -1,11 +1,19 @@
 'use strict'
 
-const cliSpinner = require('cli-spinner')
+const { Spinner } = require('cli-spinner')
 
-function spinner(text = 'loading..') {
-  const spinner = new cliSpinner(`${text} %s`)
-  spinner.setSpinnerString('|/-\\')
-  return spinner
+function start(msg, spinnerString = '|/-\\') {
+    const spinner = new Spinner(msg + ' %s')
+    spinner.setSpinnerString(spinnerString)
+    spinner.start()
+    return spinner
 }
 
-module.exports = spinner
+function stop(spinner) {
+    spinner.stop(true)
+    console.log() // 隔一行
+}
+module.exports = {
+    start,
+    stop,
+}

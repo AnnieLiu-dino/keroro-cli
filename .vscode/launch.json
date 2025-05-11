@@ -1,24 +1,24 @@
 {
-  // 使用 IntelliSense 了解相关属性。
-  // 悬停以查看现有属性的描述。
-  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
-  "version": "0.2.0",
-  "configurations": [
-
-
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "启动 Keroro CLI",
-      "skipFiles": [
-        // "node_modules/**",
-        "<node_internals>/**"
-      ],
-      "program": "${workspaceFolder}/core/cli/bin/index.js",
-      "args": [
-        "clone",
-        "my-project",
-      ]
-    }
-  ]
+    // 使用 IntelliSense 了解相关属性。
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "启动 Keroro CLI",
+            "skipFiles": [
+                // "node_modules/**",
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/packages/cli/bin/index.js",
+            "args": [
+                "create",
+                "my-project",
+                "--targetPath",
+                "/Users/liuyan/FE/keroro-cli/packages/create"
+            ]
+        }
+    ]
 }
