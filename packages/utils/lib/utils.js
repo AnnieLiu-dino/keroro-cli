@@ -24,8 +24,8 @@ function isObject(o) {
     return Object.prototype.toString.call(o) === '[object Object]'
 }
 
-function sleep(timeout) {
-    return Promise.resolve(() => setTimeout(() => {}, timeout))
+function sleep(ms = 1000) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function exec_script(command, args, options = {}) {

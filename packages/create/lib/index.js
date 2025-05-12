@@ -1,7 +1,6 @@
 'use strict'
 const path = require('path')
 const fs = require('fs-extra')
-
 const userHome = require('user-home')
 const ejs = require('ejs')
 
@@ -59,9 +58,9 @@ class CreateCommand extends Command {
                 return
             }
             // 2.下载模版
-            this._downloadTemplate()
+            await this._downloadTemplate()
             // 3.安装模版
-            this._installTemplate()
+            await this._installTemplate()
         } catch (e) {
             log.error(
                 'has error happend in execute stage for command-create',
@@ -166,34 +165,42 @@ class CreateCommand extends Command {
 
         let cli_spinner
 
-        try {
-            // 看要下载的npm是否存在
-            const existPkg = await this.templateNpmPkg.exists()
-            log.info('existPkg', existPkg)
+        // 看要下载的npm是否存在
+        const existPkg = await this.templateNpmPkg.exists()
+        log.info('existPkg', existPkg)
 
-            if (!existPkg) {
+        if (!existPkg) {
+            try {
                 cli_spinner = spinner.start('正在下载模版...')
                 // 让动画执行 1s
                 await utils.sleep(1000)
                 await this.templateNpmPkg.install()
+            } catch (e) {
+                console.error(e.message)
+                throw new Error(e.message)
+            } finally {
                 spinner.stop(cli_spinner)
-            } else {
+                if (await this.templateNpmPkg.exists()) {
+                    log.success('下载模版成功')
+                }
+            }
+        } else {
+            try {
                 cli_spinner = spinner.start('正在更新模版...')
                 await utils.sleep(1000)
                 await this.templateNpmPkg.update()
+            } catch (e) {
+                console.error(e.message)
+                throw new Error(e.message)
+            } finally {
                 spinner.stop(cli_spinner)
+                log.success('更新模版成功')
             }
-        } catch (e) {
-            console.error(e.message)
-            throw new Error(e.message)
-        } finally {
-            await this._installTemplate()
         }
     }
 
     // 将已经缓存的模版进行安装
     async _installTemplate() {
-        log.info('_installTemplate', JSON.stringify(this.templateInfo))
         if (!this.templateInfo) throw new Error('没有模版信息，try again')
         const { type = 'normal', npmName, version } = this.templateInfo
         await this._installNormalTemplate()
@@ -207,18 +214,22 @@ class CreateCommand extends Command {
     }
 
     async execCommand(command, errMsg) {
+        if (!command) throw new Error('command')
         const script = command.split(' ')
-        let cmd = script[0]
-        cmd = this.checkCommand(cmd)
-        if (!cmd) throw new Error('命令不存在')
+        const cmd = this.checkCommand(script[0])
+        if (!cmd) throw new Error(`命令不存在 ${cmd}`)
 
         const args = script.slice(1)
-        const res = await utils.execAsync(cmd, args, {
-            stdio: 'inherit',
-            cwd: process.cwd(),
-        })
-        if (res !== 0) {
-            throw new Error(errMsg)
+        try {
+            const res = await utils.execAsync(cmd, args, {
+                stdio: 'inherit',
+                cwd: process.cwd(),
+            })
+            if (res !== 0) {
+                throw new Error(errMsg)
+            }
+        } catch (e) {
+            log.error(e.message)
         }
     }
 
@@ -230,7 +241,7 @@ class CreateCommand extends Command {
             // 缓存下来的模版的路径
             const templatePath = path.resolve(
                 this.templateNpmPkg.cacheFilePath,
-                'template1',
+                'template',
             )
             // 拷贝模版代码到当前目录
             const targetPath = this.cwd
@@ -247,15 +258,18 @@ class CreateCommand extends Command {
             log.success('模版安装成功')
         }
 
-        const ignore = ['node_modules/**', 'public/**']
+        const ignore = ['node_modules/**', 'public/**', 'src/assets/**']
         await this.ejsRender({ ignore })
 
-        // const { command: { install, start } } = this.templateInfo
-        // // 依赖安装
-        // await this.execCommand(install, '依赖安装过程失败')
-        // log.success('安装依赖成功，进入启动环节')
-        // // 启动命令执行
-        // await this.execCommand(start, '启动命令失败')
+        const {
+            command: { install, start },
+        } = this.templateInfo
+        console.log(install, start)
+        // 依赖安装
+        await this.execCommand(install, '依赖安装过程失败')
+        log.success('安装依赖成功，进入启动环节')
+        // 启动命令执行
+        await this.execCommand(start, '启动命令失败')
     }
 
     async _installCustomTemplate() {
@@ -265,6 +279,7 @@ class CreateCommand extends Command {
     async ejsRender(option) {
         console.log('this.projectInfo', this.projectInfo)
         const { projectName, projectVersion } = this.projectInfo
+        // <%= app.name%>
         const tempalteData = {
             app: { name: projectName, version: projectVersion },
         }
@@ -282,12 +297,10 @@ class CreateCommand extends Command {
                     if (err) {
                         reject(err)
                     }
-                    console.log(files)
                     Promise.all(
                         files.map((file) => {
                             // 对文件进行 render
                             const filePath = path.join(dir, file)
-                            console.log('filePath', filePath)
                             return new Promise((resolve1, reject1) => {
                                 ejs.renderFile(
                                     filePath,
@@ -295,6 +308,11 @@ class CreateCommand extends Command {
                                     {},
                                     (err, res) => {
                                         if (err) {
+                                            console.error(
+                                                'filePath',
+                                                filePath,
+                                                err.message,
+                                            )
                                             reject1(err)
                                         } else {
                                             // renderFile 不会真正去修改文件，会返回修改过后的字符串
@@ -311,7 +329,7 @@ class CreateCommand extends Command {
                             resolve()
                         })
                         .catch((err) => {
-                            console.err(err.message)
+                            console.error(err.message)
                         })
                 },
             )

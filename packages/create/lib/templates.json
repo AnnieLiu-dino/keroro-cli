@@ -7,20 +7,10 @@
             "type": "normal",
             "command": {
                 "install": "npm install --registry=https://registry.npm.taobao.org",
-                "start": "npm run start"
-            }
+                "start": "npm run dev"
+            },
+            "ignore": ["node_modules/**", "public/**", "src/assets/**"]
         }
     ],
-    "component_templates": [
-        {
-            "name": "nextjs模版",
-            "npmName": "keroro-fe-template-nextjs",
-            "version": "1.0.0",
-            "type": "normal",
-            "command": {
-                "install": "npm install --registry=https://registry.npm.taobao.org",
-                "start": "npm run start"
-            }
-        }
-    ]
+    "component_templates": []
 }

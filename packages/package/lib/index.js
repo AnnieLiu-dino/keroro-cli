@@ -124,8 +124,11 @@ class Package {
         const lastestVersion = await npmInfo.getNpmLatestVersionNum(
             this.pkgName,
         )
+        log.info('lastestVersion', lastestVersion)
         const pkgCachePath = this.specifyVersionPkgCachePath(lastestVersion)
         const hasLatestPkg = await pathExists(pkgCachePath)
+        log.info('hasLatestPkg', hasLatestPkg)
+
         if (hasLatestPkg) {
             log.notice(`当前已是最新版本：${this.pkgName}@${lastestVersion}`)
         } else {
