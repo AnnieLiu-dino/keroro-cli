@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.15](https://github.com/AnnieLiu-dino/keroro-cli/compare/@keroro-cli/create@1.0.0-beta.14...@keroro-cli/create@1.0.0-beta.15) (2025-05-14)
+
+### Bug Fixes
+
+- **packages:** the process of -tp ([19ffb02](https://github.com/AnnieLiu-dino/keroro-cli/commit/19ffb021c9d39d841aa3e0f04ef3d957650b254a))
+
 # 1.0.0-beta.14 (2025-05-14)
 
 ### Bug Fixes

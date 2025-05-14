@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/core",
-    "version": "0.0.3-beta.22",
+    "version": "0.0.3-beta.23",
     "description": "entry file for keroro-cli",
     "keywords": [
         "cli",
