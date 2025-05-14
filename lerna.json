@@ -1,7 +1,13 @@
 {
-  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-  "version": "0.0.2",
-  "packages": [
-    "packages/*"
-  ]
+    "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+    "version": "independent",
+    "packages": ["packages/*"],
+    "command": {
+        "publish": {
+            "conventionalCommits": true,
+            "message": "chore(release): beta publish",
+            "ignoreChanges": ["**/*.md", "*.md"],
+            "allowBranch": "master"
+        }
+    }
 }

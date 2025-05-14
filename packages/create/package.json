@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/create",
-    "version": "0.0.0",
+    "version": "1.0.0-beta.1",
     "description": "> TODO: description",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -14,7 +14,8 @@
         "lib"
     ],
     "publishConfig": {
-        "registry": "https://registry.npmmirror.com/"
+        "access": "public",
+        "registry": "https://registry.npmjs.org"
     },
     "repository": {
         "type": "git",
@@ -27,9 +28,9 @@
         "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
     },
     "dependencies": {
-        "@keroro-cli/command": "file:../command",
-        "@keroro-cli/package": "file:../package",
-        "@keroro-cli/utils": "file:../utils",
+        "@keroro-cli/command": "*",
+        "@keroro-cli/package": "*",
+        "@keroro-cli/utils": "*",
         "ejs": "^3.1.5",
         "glob": "^7.1.6"
     }

@@ -5,36 +5,47 @@ const urlJoin = require('url-join')
 const semver = require('semver')
 const { log } = require('./log')
 
-async function getNpmInfo(npmName, registry) {
+const DEFAULT_REGISTRY = 'https://registry.npmjs.org'
+
+function getDefaultRegistry() {
+    return DEFAULT_REGISTRY
+}
+async function getNpmPkgInfo(npmName, registry = DEFAULT_REGISTRY) {
     if (!npmName) return null
     const domain = registry || getDefaultRegistry()
-    const url = urlJoin(domain, npmName)
     // registry.npmjs.org/keroro-fe-template-nextjs
-    https: try {
+    const url = urlJoin(domain, npmName)
+    try {
         const res = await axios.get(url)
         const { status, data } = res
         if (status === 200) {
             return data
         }
     } catch (e) {
-        log.error('获取npm信息发生错误', e.message)
+        console.error(e.message)
         return null
     }
 }
 
-function getDefaultRegistry(isOrigin = true) {
-    const originDomain = 'https://registry.npmjs.org'
-    const tbDomain = 'https://registry.npm.taobao.org'
-    return isOrigin ? originDomain : tbDomain
-}
-
 // ordered versions
-async function getVersions(name, registry) {
-    const { versions = {} } = await getNpmInfo(name, registry)
+async function getOrderedVersions(name, registry = DEFAULT_REGISTRY) {
+    const pkgInfo = await getNpmPkgInfo(name, registry)
+    if (!pkgInfo) {
+        throw new Error(
+            `Failed to fetch package info for "${name}" from ${registry}`,
+        )
+    }
+    const { versions = {} } = pkgInfo
     const list = Object.keys(versions).sort((prev, next) =>
         semver.compare(next, prev),
     )
     return list
+}
+
+// 返回最新版本的具体版本号
+async function getNpmLatestVersionNum(name, registry) {
+    const versions = await getOrderedVersions(name, registry)
+    return versions[0]
 }
 
 function getSemverVersions(baseVersion, versions) {
@@ -43,18 +54,12 @@ function getSemverVersions(baseVersion, versions) {
 }
 
 async function getNpmLatestVersion(name, version, registry) {
-    const versions = await getVersions(name, registry)
+    const versions = await getOrderedVersions(name, registry)
     const satisfyVersions = getSemverVersions(version, versions)
     if (satisfyVersions && satisfyVersions.length > 0) {
         return satisfyVersions[0]
     }
     return '1.0.0'
-}
-
-// 返回最新版本的具体版本号
-async function getNpmLatestVersionNum(name, registry) {
-    const versions = await getVersions(name, registry)
-    return versions[0] || '1.0.0'
 }
 
 async function isLatestVersion(name, version, registry) {
@@ -66,10 +71,9 @@ async function isLatestVersion(name, version, registry) {
 }
 
 module.exports = {
-    getNpmInfo,
-    getVersions,
+    getDefaultRegistry,
+    getNpmPkgInfo,
     getNpmLatestVersion,
     getNpmLatestVersionNum,
     isLatestVersion,
-    getDefaultRegistry,
 }

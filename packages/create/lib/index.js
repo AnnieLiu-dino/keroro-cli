@@ -1,7 +1,7 @@
 'use strict'
 const path = require('path')
 const fs = require('fs-extra')
-const userHome = require('user-home')
+const userHomeDir = require('user-home')
 const ejs = require('ejs')
 
 const { log } = require('@keroro-cli/utils')
@@ -147,8 +147,8 @@ class CreateCommand extends Command {
     // 先把文件下载到缓存目录
     async _downloadTemplate() {
         // 在缓存目录下创建template文件夹
-        const targetPath = path.resolve(userHome, '.keroro-cli', 'templates')
-        const storePath = path.resolve(targetPath, 'node_modules')
+        const targetPath = path.resolve(userHomeDir, '.keroro-cli', 'templates')
+        const storeDir = path.resolve(targetPath, 'node_modules')
         const { projectTemplateName } = this.projectInfo
         this.templateInfo = this.projectTemplates.find(
             (item) => item.npmName === projectTemplateName,
@@ -157,7 +157,7 @@ class CreateCommand extends Command {
 
         this.templateNpmPkg = new Package({
             targetPath,
-            storePath,
+            storeDir,
             name: npmName,
             version,
         })

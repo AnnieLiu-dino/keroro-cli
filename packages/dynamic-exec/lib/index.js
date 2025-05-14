@@ -3,20 +3,16 @@
 const path = require('path')
 const child_process = require('child_process')
 const { log } = require('@keroro-cli/utils')
-
 const Package = require('../../package/lib')
 
 // 配置表：key: 命令名称，value: npm包名称
 const SETTING = {
-    create: '@imooc-cli/init',
-    // clone: "@keroro-cli/clone",
+    create: '@keroro-cli/create',
 }
-const CACHE_DIR = 'dependencies/'
 
 async function exec() {
-    let targetPath = process.env.KERORO_CLI_TARGET_PATH
     const envPath = process.env.KERORO_CLI_ENV_PATH
-    let storePath = ''
+    let storeDir = ''
     let pkg
     // this = clone command
     const commandName = this.name()
@@ -24,33 +20,34 @@ async function exec() {
     const pkgVersion = 'latest'
 
     // 没有指定文件，就下载对应的 npm package
-    if (!targetPath) {
-        // 生成“缓存目录“的路径
-        targetPath = path.resolve(envPath, CACHE_DIR)
-        // 生成“缓存文件夹”的路径
-        storePath = path.resolve(targetPath, 'node_modules')
-        log.verbose('targetPath', targetPath, 'storePath', storePath)
+    if (!process.env.KERORO_CLI_CMD_LOCAL_PATH) {
+        const execRootDir = path.resolve(envPath, 'dependencies/')
+        const storeDir = path.resolve(execRootDir, 'node_modules')
         pkg = new Package({
-            targetPath,
-            storePath,
+            execRootDir,
+            storeDir,
             name: pkgName,
             version: pkgVersion,
         })
-        if (await pkg.exists()) {
-            // 更新package
-            pkg.update()
+        const hasPkgInLocal = await pkg.exists()
+        if (hasPkgInLocal) {
+            await pkg.update()
         } else {
-            // 安装package
             await pkg.install()
         }
     } else {
-        // 指定文件去执行
-        pkg = new Package({ targetPath, name: pkgName, version: pkgVersion })
+        // 指定文件：cmdLocalPath 去执行
+        pkg = new Package({
+            execRootDir: process.env.KERORO_CLI_CMD_LOCAL_PATH,
+            name: pkgName,
+            version: pkgVersion,
+        })
+        console.log(pkg)
     }
 
-    const entryFilePath = pkg.getEntryFilePath()
-    log.verbose('entryFilePath', entryFilePath)
-    if (entryFilePath) {
+    const pkgEntryFilePath = pkg.getEntryFilePath()
+    log.info('entryFilePath', pkgEntryFilePath)
+    if (pkgEntryFilePath) {
         try {
             // // 在当前进程中调用：无法充分利用cpu资源
             // // 将对象转数组 Array.from(arguments)
@@ -58,14 +55,12 @@ async function exec() {
 
             // 在node 子进程中调用，额外获得cpu资源
             //使用多进程去执行
-            const args = [commandName, this.opts()]
-            log.verbose('args', args)
+            const options = this.opts()
+            const args = [commandName, options]
             // 1. 先将命令行参数转成字符串
-            const exec_code = `require('${entryFilePath}').call(null, ${JSON.stringify(
+            const exec_code = `require('${pkgEntryFilePath}').call(null, ${JSON.stringify(
                 args,
             )})`
-            log.verbose('exec_code', exec_code)
-            log.verbose('cwd', process.cwd())
 
             const child = spawn(exec_code, {
                 cwd: process.cwd(),
@@ -99,9 +94,6 @@ function spawn(exec_code, options) {
 
     // Mac下：
     // child_process.spawn('node', ['-e', exec_code]
-    log.verbose('command', command)
-    log.verbose('args', args)
-    log.verbose('options', options)
     const child = child_process.spawn(command, args, {
         ...options,
     })

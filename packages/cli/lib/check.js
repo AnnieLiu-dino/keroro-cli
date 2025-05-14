@@ -1,85 +1,62 @@
 'use strict'
-// node内置库
 const path = require('path')
 
-// 依赖的外部库
-const userHome = require('user-home')
+const rootCheck = require('root-check')
+const userHomeDir = require('user-home')
 const pathExists = require('path-exists').sync
-const colors = require('colors/safe')
 
-// 依赖的内部库
-const { log } = require('@keroro-cli/utils')
-
-// 变量区域
+const { log, npmInfo } = require('@keroro-cli/utils')
 const constant = require('./constant')
-const { getNpmLatestVersionNum } = require('@keroro-cli/utils/lib/npmInfo')
 
-class Check {
-    config = null
-    constructor() {}
-
-    pkgVersion(pkg) {
+class PreCheck {
+    printVersion(pkg) {
         log.success('version', pkg.version)
     }
 
-    // 检查root启动
     userAuth() {
-        // 当前用户 OS
-        const curUserAuthCode = process.geteuid()
-        require('root-check')()
-        // 实现原理是：root用户,process.getuid() === 0。普通用户，为501。若检测到是root用户，就降级操作process.seteuid()
-        // 为什么要做这步操作：当root用户操作的一些文件后，普通用户在进来操作会有权限问题
+        rootCheck()
     }
 
-    // 检查用户主目录 userHome
+    // Check if user home directory exists
     userHome() {
-        if (!userHome || !pathExists(userHome)) {
-            throw new Error(colors.red(`主目录不存在`))
+        if (!userHomeDir || !pathExists(userHomeDir)) {
+            throw new Error(`User home directory does not exist.`)
         }
     }
 
-    // 脚手架环境的生成
+    // Load .env configuration into process.env
     checkEnv() {
-        log.verbose('开始检查环境变量', path.resolve(userHome, '.env'))
-        const dotenv = require('dotenv')
-        const envPath = path.resolve(userHome, '.env')
-
+        const envPath = path.resolve(userHomeDir, '.env')
         if (pathExists(envPath)) {
-            // dotenv的作用是：将.env文件中的变量加载到process.env中
-            // 例如：.env文件中有一个变量叫KERORO_CLI_ENV_PATH，dotenv会将它加载到process.env.KERORO_CLI_ENV_PATH中
-            dotenv.config({
-                path: envPath,
-            })
+            const dotenv = require('dotenv')
+            dotenv.config({ path: envPath })
+        } else {
+            log.info('.env file not found at', envPath)
         }
-        // 创建默认用户主目录 .env
+
+        // Set default env path
         process.env.KERORO_CLI_ENV_PATH = path.join(
-            userHome,
+            userHomeDir,
             constant.KERORO_CLI_DEFAULT_ENV_FILENAME,
         )
     }
 
-    // 功能：告诉用户可以升级版本
     async globalUpdate(pkg) {
-        // 获取当前版本号和包名
         const { name, version } = pkg
-        // 调取 npm API，获取所有版本号
-        const { npmInfo } = require('@keroro-cli/utils')
-        // 提取所有版本号，比对那些版本号是大于当前版本号
         const isLatest = await npmInfo.isLatestVersion(name, version)
+
         if (!isLatest) {
-            const latestVersion = await npmInfo.getNpmLatestVersionNum(
-                name,
-                version,
-            )
-            log.warn(
-                colors.yellow(`
-        建议安装最新版本
-        npm install ${name}@^${latestVersion} -g
-        yarn global add ${name}@^${latestVersion}`),
-            )
+            const latestVersion = await npmInfo.getNpmLatestVersionNum(name)
+            log.warn(`
+A newer version of ${name} is available.
+Current: ${version} → Latest: ${latestVersion}
+
+To update, run:
+  npm install -g ${name}@^${latestVersion}
+  or
+  yarn global add ${name}@^${latestVersion}`)
         }
     }
 }
-const prepareCheck = new Check()
 
-module.exports = prepareCheck
+module.exports = new PreCheck()

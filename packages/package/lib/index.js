@@ -8,92 +8,83 @@ const fsExtra = require('fs-extra')
 
 const { log, npmInfo, utils } = require('@keroro-cli/utils')
 class Package {
-    // 包的信息
-    pkgName = null
-    pkgVersion = null
-    // package的路径
-    targetPath = null
-    // package的存储路径:缓存在本地的一个路径
-    storePath = null
-
     constructor(options) {
         if (!options || !utils.isObject(options)) {
-            throw new Error('Package constructor has error')
+            throw new Error('Package的参数有问题')
         }
-        const { targetPath, storePath, name, version } = options
-        this.targetPath = targetPath
-        this.storePath = storePath
+        const { execRootDir, storeDir, name, version } = options
+        // package的路径
+        this.execRootDir = execRootDir
+        // package的存储路径:缓存在本地的一个路径
+        this.storeDir = storeDir
         this.pkgName = name
         this.pkgVersion = version
     }
-    // 获取指定路径下 package.json中入口文件的地址
-    // eg: /.keroro-cli/dependencies/node_modules/XXXXX/lib/index.js
-    getRootFile(targetPath) {
-        // 1. 获取package.json所在目录
-        const dir = pkgDir(targetPath)
-        if (dir) {
-            // 2. 读取package.json
-            const pkgFile = require(path.resolve(dir, 'package.json'))
-            // 3. 寻找main/lib
-            if (pkgFile && pkgFile.main) {
-                // 4. 路径的兼容(macOS/windows)
-                const entryFilePath = utils.formatPath(
-                    path.resolve(dir, pkgFile.main),
-                )
-                log.module('entryFilePath', entryFilePath)
-                return entryFilePath
-            }
-        }
-        return null
-    }
 
-    // 获取入口文件路径(逐层向上查找package.json所在层级)
-    // targetPath路径下的入口文件（一般是 package.json 里面 "main" 指向的 js 文件）
-    getEntryFilePath() {
-        // 如果有缓存文件夹，就去缓存文件夹去找执行文件
-        if (this.storePath) {
-            return this.getRootFile(this.cacheFilePath)
-        } else {
-            // 反之去找 指定文件夹中的入口文件, 进入本地调试模式
-            return this.getRootFile(this.targetPath)
-        }
-    }
-
-    get cacheFilePathPrefix() {
-        return `${this.pkgName.replace('/', '_')}@${this.pkgVersion}`
-    }
-
-    get cacheFilePath() {
-        const _p = path.resolve(
-            this.storePath,
-            `_${this.cacheFilePathPrefix}@${this.pkgName}`,
-        )
-        log.module('cacheFilePath', _p)
-        // "/Users/liuyan/.keroro-cli/dependencies/node_modules/_@imooc-cli_init@1.0.1@@imooc-cli/init";
-        return _p
-    }
-
-    // latest 转 具体版本号
     async prepare() {
-        // 如果有storePath属性值，但是目录不存在，=》创建目录
-        if (this.storePath && !pathExists(this.storePath)) {
+        // 如果有 storeDir 属性值，但是目录不存在，=》创建目录
+        if (this.storeDir && !pathExists(this.storeDir)) {
             // mkdirp 是将路径上所有的文件都创建好
-            fsExtra.mkdirpSync(this.storePath)
+            fsExtra.mkdirpSync(this.storeDir)
         }
         if (this.pkgVersion === 'latest') {
             this.pkgVersion = await npmInfo.getNpmLatestVersionNum(this.pkgName)
         }
     }
 
+    // 获取指定路径下 package.json中入口文件的地址
+    // eg: /.keroro-cli/dependencies/node_modules/XXXXX/lib/index.js
+    _getRootFile(dirPath) {
+        // 1. 获取package.json所在目录
+        const dir = pkgDir(dirPath)
+        if (dir) {
+            // 2. 读取package.json
+            const pkgFile = require(path.resolve(dir, 'package.json'))
+            // 3. 寻找main/lib
+            if (pkgFile && pkgFile.main) {
+                // 4. 路径的兼容(macOS/windows)
+                const mainFilePath = utils.formatPath(
+                    path.resolve(dir, pkgFile.main),
+                )
+                log.module('mainFilePath', mainFilePath)
+                return mainFilePath
+            }
+        }
+        return null
+    }
+
+    // 获取入口文件路径(逐层向上查找package.json所在层级)
+    // execRootDir 路径下的入口文件（一般是 package.json 里面 "main" 指向的 js 文件）
+    getEntryFilePath() {
+        // 如果有缓存文件夹，就去缓存文件夹去找执行文件
+        if (this.storeDir) {
+            return this._getRootFile(this.cachePkgDir)
+        } else {
+            // 反之去找 指定文件夹中的入口文件, 进入本地调试模式
+            return this._getRootFile(this.execRootDir)
+        }
+    }
+
+    cacheFilePath(version) {
+        const prefix = this.pkgName.replace('/', '_')
+        const _path = path.resolve(
+            this.storeDir,
+            `_${prefix}@${version || this.pkgVersion}@${this.pkgName}`,
+        )
+        log.module('cacheFilePath', _p)
+        return _path
+    }
+
     // npm package 是否存在
     async exists() {
         // 如果缓存目录存在，去缓存目录里找
-        if (this.storePath) {
+        if (this.storeDir) {
             // get lastest version 安装的时候可以用latest，但是查询的时候是以npm-name@x.x.x去找的
             await this.prepare()
             return await pathExists(this.cacheFilePath)
         } else {
-            return pathExists(this.targetPath)
+            log.module('exists', 'this.storeDir 不存在')
+            // return pathExists(this.execRootDir)
         }
     }
 
@@ -102,17 +93,7 @@ class Package {
         // 异步
         await this.prepare()
         log.notice(`正在下载${this.pkgName}@${this.pkgVersion}`)
-        return this.pureInstall(this.pkgName, this.pkgVersion)
-    }
-
-    // 最新版本若存在本地，对应的路径
-    specifyVersionPkgCachePath(version) {
-        const prefix = `${this.pkgName.replace('/', '_')}@${version}`
-        const latestPkgPath = path.resolve(
-            this.storePath,
-            `_${prefix}@${this.pkgName}`,
-        )
-        return latestPkgPath
+        return await this.pureInstall(this.pkgName, this.pkgVersion)
     }
 
     // 更新package
@@ -125,7 +106,7 @@ class Package {
             this.pkgName,
         )
         log.info('lastestVersion', lastestVersion)
-        const pkgCachePath = this.specifyVersionPkgCachePath(lastestVersion)
+        const pkgCachePath = this.cacheFilePath(lastestVersion)
         const hasLatestPkg = await pathExists(pkgCachePath)
         log.info('hasLatestPkg', hasLatestPkg)
 
@@ -139,17 +120,10 @@ class Package {
     }
 
     async pureInstall(name, version) {
-        log.module(
-            'pureInstall',
-            this.targetPath,
-            this.storePath,
-            name,
-            version,
-        )
         return npminstall({
             // 模块路径
-            root: this.targetPath,
-            storeDir: this.storePath,
+            root: this.execRootDir,
+            storeDir: this.storeDir,
             registry: npmInfo.getDefaultRegistry(true),
             pkgs: [{ name, version }],
         })

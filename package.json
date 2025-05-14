@@ -1,20 +1,28 @@
 {
-  "name": "root",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "format": "prettier --write \"packages/**/*.{js,ts,jsx,tsx,json,md}\"",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "*.{js,ts,jsx,tsx,json,md}": "prettier --write"
-  },
-  "devDependencies": {
-    "husky": "^9.1.7",
-    "lerna": "^6.6.2",
-    "lint-staged": "^15.5.2",
-    "prettier": "^3.5.3"
-  }
+    "name": "keroro-cli-monorepo",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "release:beta": "lerna publish --canary --preid beta --dist-tag beta --message 'chore(release): beta publish'",
+        "release:stable": "lerna publish --message 'chore(release): stable publish'",
+        "format": "prettier --write \"packages/**/*.{js,ts,jsx,tsx,json,md}\"",
+        "prepare": "husky",
+        "build": "lerna run build"
+    },
+    "lint-staged": {
+        "*.{js,ts,jsx,tsx,json,md}": "prettier --write"
+    },
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "lerna": "^8.2.2",
+        "lint-staged": "^15.5.2",
+        "prettier": "^3.5.3"
+    },
+    "dependencies": {
+        "axios": "1.9.0",
+        "npminstall": "7.12.0",
+        "simple-git": "3.27.0"
+    }
 }

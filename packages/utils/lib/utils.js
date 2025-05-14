@@ -1,22 +1,17 @@
 const path = require('path')
-const { log } = require('@keroro-cli/utils')
 
 // 兼容window/mac的路径: 保证路径里都是 /
 function formatPath(_path) {
-    try {
-        if (_path && typeof _path === 'string') {
-            // path.sep 是 Node.js 提供的路径分隔符：
-            // 在 Linux/macOS 上是 / ; 在 Windows 上是 \
-            const sep = path.sep
-            // mac
-            if (sep === '/') return _path
-            // window 的连接符替换
-            return _path.replace(/\\/g, '/')
-        } else {
-            throw new Error('formatPath 参数格式错误')
-        }
-    } catch (e) {
-        log.error('formatPath 错误', e.message)
+    if (_path && typeof _path === 'string') {
+        // path.sep 是 Node.js 提供的路径分隔符：
+        // 在 Linux/macOS 上是 / ; 在 Windows 上是 \
+        const sep = path.sep
+        // mac
+        if (sep === '/') return _path
+        // window 的连接符替换
+        return _path.replace(/\\/g, '/')
+    } else {
+        throw new Error('formatPath 参数格式错误')
     }
 }
 

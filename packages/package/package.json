@@ -1,35 +1,37 @@
 {
-  "name": "@keroro-cli/package",
-  "version": "0.0.0",
-  "description": "> TODO: description",
-  "author": "AnneLiu <anne.liu0825@gmail.com>",
-  "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
-  "license": "ISC",
-  "main": "lib/index.js",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
-  "files": [
-    "lib"
-  ],
-  "publishConfig": {
-    "registry": "https://registry.npmmirror.com/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AnnieLiu-dino/keroro-cli.git"
-  },
-  "scripts": {
-    "test": "node ./__tests__/@keroro-cli/package.test.js"
-  },
-  "bugs": {
-    "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
-  },
-  "dependencies": {
-    "@keroro-cli/exec": "file:../dynamic-exec",
-    "@keroro-cli/utils": "file:../utils",
-    "npminstall": "^4.9.1",
-    "pkg-dir": "^5.0.0"
-  }
+    "name": "@keroro-cli/package",
+    "version": "0.0.0",
+    "description": "> TODO: description",
+    "author": "AnneLiu <anne.liu0825@gmail.com>",
+    "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
+    "license": "ISC",
+    "main": "lib/index.js",
+    "directories": {
+        "lib": "lib",
+        "test": "__tests__"
+    },
+    "files": [
+        "lib"
+    ],
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AnnieLiu-dino/keroro-cli.git"
+    },
+    "scripts": {
+        "test": "node ./__tests__/@keroro-cli/package.test.js"
+    },
+    "bugs": {
+        "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
+    },
+    "dependencies": {
+        "@keroro-cli/exec": "*",
+        "@keroro-cli/utils": "*",
+        "axios": "1.9.0",
+        "npminstall": "^7.12.0",
+        "pkg-dir": "^5.0.0",
+        "simple-git": "3.27.0"
+    }
 }
