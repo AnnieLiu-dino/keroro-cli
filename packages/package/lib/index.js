@@ -1,8 +1,7 @@
 'use strict'
 const path = require('path')
-
+const pacote = require('pacote')
 const pkgDir = require('pkg-dir').sync
-const npminstall = require('npminstall')
 const pathExists = require('path-exists')
 const fsExtra = require('fs-extra')
 

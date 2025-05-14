@@ -5,7 +5,6 @@
     "command": {
         "publish": {
             "conventionalCommits": true,
-            "message": "chore(release): beta publish",
             "ignoreChanges": ["**/*.md", "*.md"],
             "allowBranch": "master"
         }
