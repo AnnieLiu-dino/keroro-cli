@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/create",
-    "version": "1.0.0-beta.13+3bb47ec",
+    "version": "1.0.0-beta.14",
     "description": "> TODO: description",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -28,9 +28,9 @@
         "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
     },
     "dependencies": {
-        "@keroro-cli/command": "^0.0.3-beta.13+3bb47ec",
-        "@keroro-cli/package": "^0.0.1-beta.15",
-        "@keroro-cli/utils": "^0.0.2-beta.13+3bb47ec",
+        "@keroro-cli/command": "^0.0.3-beta.14",
+        "@keroro-cli/package": "^0.0.1-beta.22",
+        "@keroro-cli/utils": "^0.0.2-beta.14",
         "ejs": "^3.1.5",
         "glob": "^11.0.2"
     },

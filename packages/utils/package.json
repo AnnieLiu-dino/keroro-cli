@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/utils",
-    "version": "0.0.2-beta.13+3bb47ec",
+    "version": "0.0.2-beta.14",
     "description": "the tool pkg for keroro cli",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",

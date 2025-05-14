@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/package",
-    "version": "0.0.1-beta.21+b9987d7",
+    "version": "0.0.1-beta.22",
     "description": "> TODO: description",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -28,7 +28,7 @@
         "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
     },
     "dependencies": {
-        "@keroro-cli/utils": "^0.0.2-beta.13+3bb47ec",
+        "@keroro-cli/utils": "^0.0.2-beta.14",
         "axios": "1.9.0",
         "pkg-dir": "^5.0.0",
         "simple-git": "3.27.0"
