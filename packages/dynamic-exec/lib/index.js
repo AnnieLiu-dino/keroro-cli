@@ -12,9 +12,8 @@ const SETTING = {
 
 async function exec() {
     const envPath = process.env.KERORO_CLI_ENV_PATH
-    let storeDir = ''
     let pkg
-    // this = clone command
+    // this = create command program
     const commandName = this.name()
     const pkgName = SETTING[commandName]
     const pkgVersion = 'latest'
@@ -42,7 +41,6 @@ async function exec() {
             name: pkgName,
             version: pkgVersion,
         })
-        console.log(pkg)
     }
 
     const pkgEntryFilePath = pkg.getEntryFilePath()
@@ -61,6 +59,7 @@ async function exec() {
             const exec_code = `require('${pkgEntryFilePath}').call(null, ${JSON.stringify(
                 args,
             )})`
+            log.info(exec_code)
 
             const child = spawn(exec_code, {
                 cwd: process.cwd(),

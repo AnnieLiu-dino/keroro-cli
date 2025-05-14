@@ -93,7 +93,8 @@ class Package {
         // 异步
         await this.prepare()
         log.notice(`正在下载${this.pkgName}@${this.pkgVersion}`)
-        return await this.pureInstall(this.pkgName, this.pkgVersion)
+        const res = await this.pureInstall(this.pkgName, this.pkgVersion)
+        log.notice(JSON.stringify(res))
     }
 
     // 更新package
@@ -120,13 +121,15 @@ class Package {
     }
 
     async pureInstall(name, version) {
-        return npminstall({
+        console.log(name, version)
+        const res = await npminstall({
             // 模块路径
             root: this.execRootDir,
             storeDir: this.storeDir,
             registry: npmInfo.getDefaultRegistry(true),
             pkgs: [{ name, version }],
         })
+        console.log(res)
     }
 }
 
