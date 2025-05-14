@@ -2,7 +2,7 @@
 
 const path = require('path')
 const child_process = require('child_process')
-const { log } = require('@keroro-cli/utils')
+const { logger } = require('@keroro-cli/utils')
 const Package = require('../../package/lib')
 
 // 配置表：key: 命令名称，value: npm包名称
@@ -44,7 +44,7 @@ async function exec() {
     }
 
     const pkgEntryFilePath = pkg.getEntryFilePath()
-    log.info('entryFilePath', pkgEntryFilePath)
+    logger.info('entryFilePath', pkgEntryFilePath)
     if (pkgEntryFilePath) {
         try {
             // // 在当前进程中调用：无法充分利用cpu资源
@@ -59,7 +59,7 @@ async function exec() {
             const exec_code = `require('${pkgEntryFilePath}').call(null, ${JSON.stringify(
                 args,
             )})`
-            log.info(exec_code)
+            logger.info(exec_code)
 
             const child = spawn(exec_code, {
                 cwd: process.cwd(),
@@ -67,17 +67,17 @@ async function exec() {
             })
             // 2. 监听子进程的输出
             child.on('error', (e) => {
-                log.error(e.message)
+                logger.error(e.message)
                 // 结束
                 process.exit(1)
             })
             // 3. 退出事件
             child.on('exit', (code) => {
-                log.verbose('命令执行结束', code)
+                logger.debug('命令执行结束', code)
                 process.exit(code)
             })
         } catch (e) {
-            log.error(e.message)
+            logger.error(e.message)
         }
     }
 }

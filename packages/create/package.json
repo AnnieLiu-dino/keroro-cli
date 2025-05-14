@@ -29,10 +29,10 @@
     },
     "dependencies": {
         "@keroro-cli/command": "^0.0.3-beta.13+3bb47ec",
-        "@keroro-cli/package": "*",
+        "@keroro-cli/package": "^0.0.1-beta.15",
         "@keroro-cli/utils": "^0.0.2-beta.13+3bb47ec",
         "ejs": "^3.1.5",
-        "glob": "^7.1.6"
+        "glob": "^11.0.2"
     },
     "gitHead": "3bb47ec84c4ec1817e93dfb86c8a536b41f64adc"
 }

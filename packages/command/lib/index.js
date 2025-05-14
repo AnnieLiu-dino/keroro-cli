@@ -1,7 +1,7 @@
 'use strict'
 
 const semver = require('semver')
-const { log } = require('@keroro-cli/utils')
+const { logger } = require('@keroro-cli/utils')
 
 const LOWEST_NODE_VERSION = '12.0.0'
 
@@ -23,7 +23,7 @@ class Command {
             chain = chain.then(() => this.execute())
             // 单独的 异步的函数，都要有单独的 try catch
             chain.catch((e) => {
-                log.error(e.message)
+                logger.error(e.message)
             })
         })
     }
@@ -41,8 +41,8 @@ class Command {
     // 参数初始化
     initArgs() {
         const [commandName, options] = this._argv
-        log.verbose('commandName', commandName)
-        log.verbose('options', options)
+        logger.debug('commandName', commandName)
+        logger.debug('options', options)
         this._cmd = commandName
         this._options = options
     }

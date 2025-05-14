@@ -1,16 +1,16 @@
 'use strict'
 const path = require('path')
+const os = require('os')
 
 const rootCheck = require('root-check')
-const userHomeDir = require('user-home')
 const pathExists = require('path-exists').sync
 
-const { log, npmInfo } = require('@keroro-cli/utils')
+const { logger, npmInfo } = require('@keroro-cli/utils')
 const constant = require('./constant')
-
+const userHomeDir = os.homedir()
 class PreCheck {
     printVersion(pkg) {
-        log.success('version', pkg.version)
+        logger.success('version', pkg.version)
     }
 
     userAuth() {
@@ -31,7 +31,7 @@ class PreCheck {
             const dotenv = require('dotenv')
             dotenv.config({ path: envPath })
         } else {
-            log.info('.env file not found at', envPath)
+            logger.info('.env file not found at', envPath)
         }
 
         // Set default env path
@@ -47,7 +47,7 @@ class PreCheck {
 
         if (!isLatest) {
             const latestVersion = await npmInfo.getNpmLatestVersionNum(name)
-            log.warn(`
+            logger.warn(`
 A newer version of ${name} is available.
 Current: ${version} → Latest: ${latestVersion}
 

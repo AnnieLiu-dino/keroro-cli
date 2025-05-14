@@ -1,10 +1,10 @@
 'use strict'
 const path = require('path')
 const fs = require('fs-extra')
-const userHomeDir = require('user-home')
+const os = require('os')
 const ejs = require('ejs')
 
-const { log } = require('@keroro-cli/utils')
+const { logger } = require('@keroro-cli/utils')
 const Command = require('@keroro-cli/command')
 const Package = require('@keroro-cli/package')
 const { spinner, utils } = require('@keroro-cli/utils')
@@ -17,6 +17,7 @@ const {
 
 const { getProjectTempaltes, getComponentTempaltes } = require('./server')
 const { stringify } = require('querystring')
+const userHomeDir = os.homedir()
 
 const WHITE_COMMAND = ['npm', 'yarn', 'cnpm']
 
@@ -54,7 +55,7 @@ class CreateCommand extends Command {
             // 1.准备阶段
             const result = await this._prepare()
             if (!result) {
-                log.info('创建项目终止')
+                logger.info('创建项目终止')
                 return
             }
             // 2.下载模版
@@ -62,7 +63,7 @@ class CreateCommand extends Command {
             // 3.安装模版
             await this._installTemplate()
         } catch (e) {
-            log.error(
+            logger.error(
                 'has error happend in execute stage for command-create',
                 e.message,
             )
@@ -83,7 +84,7 @@ class CreateCommand extends Command {
         // 1、判断当前目录是否为空
         // 如果目录里只有 .文件 和 node_modules 目录，算是空目录
         const isDirEmpty = this._isDirEmpty()
-        log.module(this.constructor.name, '当前执行目录是否为空', isDirEmpty)
+        logger.info(this.constructor.name, '当前执行目录是否为空', isDirEmpty)
         let isContinue = false
         // 若是 force：false，询问用户是否继续创建项目
         // 若是 force：true，无需在过问那么多条件
@@ -130,7 +131,7 @@ class CreateCommand extends Command {
     }
 
     _isDirEmpty() {
-        log.module(this.constructor.name, '当前的执行目录', this.cwd)
+        logger.info(this.constructor.name, '当前的执行目录', this.cwd)
         // 读出所有的文件列表
         let fileList = fs.readdirSync(this.cwd)
         fileList = fileList.filter((filename) => {
@@ -161,13 +162,13 @@ class CreateCommand extends Command {
             name: npmName,
             version,
         })
-        log.info('this.templateNpmPkg', JSON.stringify(this.templateNpmPkg))
+        logger.info('this.templateNpmPkg', JSON.stringify(this.templateNpmPkg))
 
         let cli_spinner
 
         // 看要下载的npm是否存在
         const existPkg = await this.templateNpmPkg.exists()
-        log.info('existPkg', existPkg)
+        logger.info('existPkg', existPkg)
 
         if (!existPkg) {
             try {
@@ -181,7 +182,7 @@ class CreateCommand extends Command {
             } finally {
                 spinner.stop(cli_spinner)
                 if (await this.templateNpmPkg.exists()) {
-                    log.success('下载模版成功')
+                    logger.success('下载模版成功')
                 }
             }
         } else {
@@ -194,7 +195,7 @@ class CreateCommand extends Command {
                 throw new Error(e.message)
             } finally {
                 spinner.stop(cli_spinner)
-                log.success('更新模版成功')
+                logger.success('更新模版成功')
             }
         }
     }
@@ -229,7 +230,7 @@ class CreateCommand extends Command {
                 throw new Error(errMsg)
             }
         } catch (e) {
-            log.error(e.message)
+            logger.error(e.message)
         }
     }
 
@@ -245,7 +246,7 @@ class CreateCommand extends Command {
             )
             // 拷贝模版代码到当前目录
             const targetPath = this.cwd
-            log.module('templatePath', templatePath, 'targetPath', targetPath)
+            logger.info('templatePath', templatePath, 'targetPath', targetPath)
             // 如果路径不存在，ensureDirSync 会自动递归创建目录（包括上层不存在的目录）。
             fs.ensureDirSync(templatePath)
             fs.ensureDirSync(targetPath)
@@ -255,7 +256,7 @@ class CreateCommand extends Command {
             console.error(error.message)
         } finally {
             spinner.stop(cli_spinner)
-            log.success('模版安装成功')
+            logger.success('模版安装成功')
         }
 
         const ignore = ['node_modules/**', 'public/**', 'src/assets/**']
@@ -267,7 +268,7 @@ class CreateCommand extends Command {
         console.log(install, start)
         // 依赖安装
         await this.execCommand(install, '依赖安装过程失败')
-        log.success('安装依赖成功，进入启动环节')
+        logger.success('安装依赖成功，进入启动环节')
         // 启动命令执行
         await this.execCommand(start, '启动命令失败')
     }

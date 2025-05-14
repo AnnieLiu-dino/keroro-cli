@@ -30,20 +30,18 @@
     "dependencies": {
         "axios": "^1.9.0",
         "cli-spinner": "^0.2.10",
+        "consola": "^3.4.2",
         "ejs": "^3.1.5",
         "fs-extra": "^9.0.1",
-        "glob": "^7.1.6",
         "inquirer": "^7.3.3",
         "kebab-case": "^1.0.0",
         "lerna": "8.2.2",
         "lodash": "^4.17.20",
-        "npmlog": "^4.1.2",
         "semver": "^7.3.5",
         "simple-git": "^3.27.0",
         "socket.io-client": "^4.8.1",
         "terminal-link": "^2.1.1",
-        "url-join": "^4.0.1",
-        "user-home": "^2.0.0"
+        "url-join": "^4.0.1"
     },
     "gitHead": "3bb47ec84c4ec1817e93dfb86c8a536b41f64adc"
 }

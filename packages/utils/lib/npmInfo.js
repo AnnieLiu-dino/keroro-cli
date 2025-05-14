@@ -3,7 +3,7 @@
 const axios = require('axios')
 const urlJoin = require('url-join')
 const semver = require('semver')
-const { log } = require('./log')
+const { logger } = require('./log')
 
 const DEFAULT_REGISTRY = 'https://registry.npmjs.org'
 

@@ -5,9 +5,9 @@
     "private": true,
     "scripts": {
         "release:beta": "npx lerna publish --canary --preid beta --dist-tag beta --message 'chore(release): beta publish'",
-        "release:stable": "lerna publish --message 'chore(release): stable publish'",
+        "release:stable": "npx lerna publish --message 'chore(release): stable publish'",
         "format": "prettier --write \"packages/**/*.{js,ts,jsx,tsx,json,md}\"",
-        "prepare": "husky",
+        "prepare": "husky install",
         "build": "lerna run build"
     },
     "lint-staged": {

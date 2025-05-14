@@ -5,7 +5,7 @@ const pkgDir = require('pkg-dir').sync
 const pathExists = require('path-exists')
 const fsExtra = require('fs-extra')
 
-const { log, npmInfo, utils } = require('@keroro-cli/utils')
+const { logger, npmInfo, utils } = require('@keroro-cli/utils')
 class Package {
     constructor(options) {
         if (!options || !utils.isObject(options)) {
@@ -45,7 +45,7 @@ class Package {
                 const mainFilePath = utils.formatPath(
                     path.resolve(dir, pkgFile.main),
                 )
-                log.module('mainFilePath', mainFilePath)
+                logger.info('mainFilePath', mainFilePath)
                 return mainFilePath
             }
         }
@@ -70,7 +70,7 @@ class Package {
             this.storeDir,
             `_${prefix}@${version || this.pkgVersion}@${this.pkgName}`,
         )
-        log.module('cacheFilePath', _p)
+        logger.info('cacheFilePath', _p)
         return _path
     }
 
@@ -82,7 +82,7 @@ class Package {
             await this.prepare()
             return await pathExists(this.cacheFilePath)
         } else {
-            log.module('exists', 'this.storeDir 不存在')
+            logger.info('exists', 'this.storeDir 不存在')
             // return pathExists(this.execRootDir)
         }
     }
@@ -91,9 +91,9 @@ class Package {
     async install() {
         // 异步
         await this.prepare()
-        log.notice(`正在下载${this.pkgName}@${this.pkgVersion}`)
+        logger.notice(`正在下载${this.pkgName}@${this.pkgVersion}`)
         const res = await this.pureInstall(this.pkgName, this.pkgVersion)
-        log.notice(JSON.stringify(res))
+        logger.notice(JSON.stringify(res))
     }
 
     // 更新package
@@ -105,15 +105,15 @@ class Package {
         const lastestVersion = await npmInfo.getNpmLatestVersionNum(
             this.pkgName,
         )
-        log.info('lastestVersion', lastestVersion)
+        logger.info('lastestVersion', lastestVersion)
         const pkgCachePath = this.cacheFilePath(lastestVersion)
         const hasLatestPkg = await pathExists(pkgCachePath)
-        log.info('hasLatestPkg', hasLatestPkg)
+        logger.info('hasLatestPkg', hasLatestPkg)
 
         if (hasLatestPkg) {
-            log.notice(`当前已是最新版本：${this.pkgName}@${lastestVersion}`)
+            logger.notice(`当前已是最新版本：${this.pkgName}@${lastestVersion}`)
         } else {
-            log.notice(`正在更新${this.pkgName}@${lastestVersion}`)
+            logger.notice(`正在更新${this.pkgName}@${lastestVersion}`)
             await this.pureInstall(this.pkgName, lastestVersion)
         }
         this.pkgVersion = lastestVersion

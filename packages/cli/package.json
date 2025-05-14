@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/core",
-    "version": "0.0.3-beta.20+73cd11d",
+    "version": "0.0.3-beta.21+b9987d7",
     "description": "entry file for keroro-cli",
     "keywords": [
         "cli",
@@ -25,16 +25,14 @@
         "registry": "https://registry.npmjs.org/"
     },
     "dependencies": {
-        "@keroro-cli/create": "*",
-        "@keroro-cli/dynamic-exec": "^0.0.1-beta.20+73cd11d",
+        "@keroro-cli/dynamic-exec": "^0.0.1-beta.15",
         "@keroro-cli/utils": "^0.0.2-beta.13+3bb47ec",
         "commander": "^8.0.0",
         "dotenv": "^16.4.7",
         "import-local": "^3.2.0",
         "path-exists": "^4.0.0",
         "root-check": "^1.0.0",
-        "semver": "^7.3.5",
-        "user-home": "^3.0.0"
+        "semver": "^7.3.5"
     },
-    "gitHead": "73cd11db3d1267c2b40c5e3eca2270dcb17a1e59"
+    "gitHead": "b9987d74b1536b96bf912354287553f15aa5d7ba"
 }

@@ -1,7 +1,7 @@
 'use strict'
 
 const commander = require('commander')
-const { log } = require('@keroro-cli/utils')
+const { logger } = require('@keroro-cli/utils')
 const dynamicExec = require('@keroro-cli/dynamic-exec')
 const pkg = require('../package.json')
 const check = require('./check')
@@ -19,7 +19,7 @@ async function preCheck() {
         check.checkEnv()
         await check.globalUpdate(pkg)
     } catch (e) {
-        log.module('preCheck', e.message)
+        logger.info('preCheck', e.message)
     }
 }
 
@@ -53,13 +53,13 @@ function registerCommand() {
     // Listen for --debug option
     program.on('option:debug', function () {
         const options = this.opts()
-        process.env.KERORO_CLI_LOG_LEVEL = options.debug ? 'verbose' : 'info'
-        log.level = process.env.KERORO_CLI_LOG_LEVEL
+        process.env.KERORO_CLI_LOG_LEVEL = options.debug ? 'debug' : 'info'
+        logger.level = process.env.KERORO_CLI_LOG_LEVEL
     })
 
     // Listen for unknown commands
     program.on('command:*', (commands) => {
-        log.error('Unknown command:', commands[0])
+        logger.error('Unknown command:', commands[0])
         program.outputHelp()
     })
 
