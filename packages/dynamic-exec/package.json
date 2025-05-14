@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/dynamic-exec",
-    "version": "0.0.0",
+    "version": "0.0.1-beta.13+3bb47ec",
     "description": "动态执行命令",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -14,6 +14,7 @@
         "lib"
     ],
     "publishConfig": {
+        "access": "public",
         "registry": "https://registry.npmjs.org"
     },
     "repository": {
@@ -27,7 +28,8 @@
         "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
     },
     "dependencies": {
-        "@keroro-cli/package": "*",
-        "@keroro-cli/utils": "*"
-    }
+        "@keroro-cli/package": "^0.0.1-beta.13+3bb47ec",
+        "@keroro-cli/utils": "^0.0.2-beta.13+3bb47ec"
+    },
+    "gitHead": "3bb47ec84c4ec1817e93dfb86c8a536b41f64adc"
 }
