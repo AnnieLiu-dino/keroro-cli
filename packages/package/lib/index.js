@@ -121,13 +121,20 @@ class Package {
 
     async pureInstall(name, version) {
         console.log(name, version)
-        const res = await npminstall({
-            // 模块路径
-            root: this.execRootDir,
-            storeDir: this.storeDir,
-            registry: npmInfo.getDefaultRegistry(true),
-            pkgs: [{ name, version }],
-        })
+        const res = await pacote.extract(
+            `${name}@${version}`,
+            path.resolve(this.execRootDir),
+            {
+                registry: npmInfo.getDefaultRegistry(true),
+            },
+        )
+        // const res = await npminstall({
+        //     // 模块路径
+        //     root: this.execRootDir,
+        //     storeDir: this.storeDir,
+        //     registry: npmInfo.getDefaultRegistry(true),
+        //     pkgs: [{ name, version }],
+        // })
         console.log(res)
     }
 }
