@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/package",
-    "version": "0.0.1-beta.13+3bb47ec",
+    "version": "0.0.1-beta.20+73cd11d",
     "description": "> TODO: description",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -33,5 +33,5 @@
         "pkg-dir": "^5.0.0",
         "simple-git": "3.27.0"
     },
-    "gitHead": "3bb47ec84c4ec1817e93dfb86c8a536b41f64adc"
+    "gitHead": "73cd11db3d1267c2b40c5e3eca2270dcb17a1e59"
 }

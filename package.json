@@ -1,5 +1,7 @@
 {
     "name": "keroro-cli-monorepo",
+    "version": "1.0.0",
+    "license": "ISC",
     "private": true,
     "scripts": {
         "release:beta": "npx lerna publish --canary --preid beta --dist-tag beta --message 'chore(release): beta publish'",

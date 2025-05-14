@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/dynamic-exec",
-    "version": "0.0.1-beta.13+3bb47ec",
+    "version": "0.0.1-beta.20+73cd11d",
     "description": "动态执行命令",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
@@ -28,8 +28,8 @@
         "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
     },
     "dependencies": {
-        "@keroro-cli/package": "^0.0.1-beta.13+3bb47ec",
+        "@keroro-cli/package": "^0.0.1-beta.20+73cd11d",
         "@keroro-cli/utils": "^0.0.2-beta.13+3bb47ec"
     },
-    "gitHead": "3bb47ec84c4ec1817e93dfb86c8a536b41f64adc"
+    "gitHead": "73cd11db3d1267c2b40c5e3eca2270dcb17a1e59"
 }

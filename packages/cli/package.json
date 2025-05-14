@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/core",
-    "version": "0.0.3-beta.13+3bb47ec",
+    "version": "0.0.3-beta.20+73cd11d",
     "description": "entry file for keroro-cli",
     "keywords": [
         "cli",
@@ -26,7 +26,7 @@
     },
     "dependencies": {
         "@keroro-cli/create": "*",
-        "@keroro-cli/dynamic-exec": "^0.0.1-beta.13+3bb47ec",
+        "@keroro-cli/dynamic-exec": "^0.0.1-beta.20+73cd11d",
         "@keroro-cli/utils": "^0.0.2-beta.13+3bb47ec",
         "commander": "^8.0.0",
         "dotenv": "^16.4.7",
@@ -36,5 +36,5 @@
         "semver": "^7.3.5",
         "user-home": "^3.0.0"
     },
-    "gitHead": "3bb47ec84c4ec1817e93dfb86c8a536b41f64adc"
+    "gitHead": "73cd11db3d1267c2b40c5e3eca2270dcb17a1e59"
 }
