@@ -3,11 +3,12 @@ const path = require('path')
 const fs = require('fs-extra')
 const os = require('os')
 const ejs = require('ejs')
+const { glob } = require('glob')
 
 const { logger } = require('@keroro-cli/utils')
 const Command = require('@keroro-cli/command')
 const Package = require('@keroro-cli/package')
-const { spinner, utils } = require('@keroro-cli/utils')
+const { utils } = require('@keroro-cli/utils')
 const {
     askIsContinue,
     askIsClearDir,
@@ -164,38 +165,29 @@ class CreateCommand extends Command {
         })
         logger.info('this.templateNpmPkg', JSON.stringify(this.templateNpmPkg))
 
-        let cli_spinner
-
         // 看要下载的npm是否存在
         const existPkg = await this.templateNpmPkg.exists()
         logger.info('existPkg', existPkg)
 
         if (!existPkg) {
             try {
-                cli_spinner = spinner.start('正在下载模版...')
-                // 让动画执行 1s
-                await utils.sleep(1000)
+                logger.start('正在下载模版...')
                 await this.templateNpmPkg.install()
             } catch (e) {
                 console.error(e.message)
                 throw new Error(e.message)
             } finally {
-                spinner.stop(cli_spinner)
                 if (await this.templateNpmPkg.exists()) {
                     logger.success('下载模版成功')
                 }
             }
         } else {
             try {
-                cli_spinner = spinner.start('正在更新模版...')
-                await utils.sleep(1000)
+                logger.start('正在检查是否更新模版...')
                 await this.templateNpmPkg.update()
             } catch (e) {
-                console.error(e.message)
+                logger.error(e.message)
                 throw new Error(e.message)
-            } finally {
-                spinner.stop(cli_spinner)
-                logger.success('更新模版成功')
             }
         }
     }
@@ -235,28 +227,30 @@ class CreateCommand extends Command {
     }
 
     async _installNormalTemplate() {
-        console.log('_installNormalTemplate', this.templateNpmPkg.cacheFilePath)
+        logger.info(
+            '_installNormalTemplate',
+            this.templateNpmPkg.cacheFilePath(),
+        )
         // 安装模版
-        const cli_spinner = spinner.start('正在安装模版...')
         try {
+            logger.start('正在安装模版...')
             // 缓存下来的模版的路径
             const templatePath = path.resolve(
-                this.templateNpmPkg.cacheFilePath,
+                this.templateNpmPkg.cacheFilePath(),
                 'template',
             )
             // 拷贝模版代码到当前目录
             const targetPath = this.cwd
-            logger.info('templatePath', templatePath, 'targetPath', targetPath)
+            logger.info('templatePath', templatePath)
+            logger.info('targetPath', targetPath)
             // 如果路径不存在，ensureDirSync 会自动递归创建目录（包括上层不存在的目录）。
             fs.ensureDirSync(templatePath)
             fs.ensureDirSync(targetPath)
             // 拷贝模版到当前路径下
             fs.copySync(templatePath, targetPath)
-        } catch (error) {
-            console.error(error.message)
-        } finally {
-            spinner.stop(cli_spinner)
             logger.success('模版安装成功')
+        } catch (error) {
+            logger.error(error.message)
         }
 
         const ignore = ['node_modules/**', 'public/**', 'src/assets/**']
@@ -268,7 +262,7 @@ class CreateCommand extends Command {
         console.log(install, start)
         // 依赖安装
         await this.execCommand(install, '依赖安装过程失败')
-        logger.success('安装依赖成功，进入启动环节')
+        logger.success('项目安装依赖成功，进入启动环节...')
         // 启动命令执行
         await this.execCommand(start, '启动命令失败')
     }
@@ -278,63 +272,35 @@ class CreateCommand extends Command {
     }
 
     async ejsRender(option) {
-        console.log('this.projectInfo', this.projectInfo)
         const { projectName, projectVersion } = this.projectInfo
         // <%= app.name%>
         const tempalteData = {
             app: { name: projectName, version: projectVersion },
         }
         const { ignore } = option
-        const dir = process.cwd()
-        return new Promise((resolve, reject) => {
-            require('glob')(
-                '**',
-                {
-                    cwd: dir,
-                    nodir: true,
-                    ignore,
-                },
-                (err, files) => {
-                    if (err) {
-                        reject(err)
-                    }
-                    Promise.all(
-                        files.map((file) => {
-                            // 对文件进行 render
-                            const filePath = path.join(dir, file)
-                            return new Promise((resolve1, reject1) => {
-                                ejs.renderFile(
-                                    filePath,
-                                    tempalteData,
-                                    {},
-                                    (err, res) => {
-                                        if (err) {
-                                            console.error(
-                                                'filePath',
-                                                filePath,
-                                                err.message,
-                                            )
-                                            reject1(err)
-                                        } else {
-                                            // renderFile 不会真正去修改文件，会返回修改过后的字符串
-                                            // 拿到结果，重新写入
-                                            fs.writeFileSync(filePath, res)
-                                            resolve1(res)
-                                        }
-                                    },
-                                )
-                            })
-                        }),
-                    )
-                        .then(() => {
-                            resolve()
-                        })
-                        .catch((err) => {
-                            console.error(err.message)
-                        })
-                },
-            )
+        const cwd = process.cwd()
+
+        const files = await glob('**', {
+            cwd,
+            nodir: true,
+            ignore,
         })
+        await Promise.all(
+            files.map(async (filename) => {
+                const filePath = path.join(cwd, filename)
+                try {
+                    const rendered = await ejs.renderFile(
+                        filePath,
+                        tempalteData,
+                        {},
+                    )
+                    await fs.writeFile(filePath, rendered)
+                } catch (err) {
+                    logger.error('filePath', filePath, err.message)
+                    throw err
+                }
+            }),
+        )
     }
 }
 

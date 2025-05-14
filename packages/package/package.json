@@ -28,9 +28,11 @@
         "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
     },
     "dependencies": {
-        "@keroro-cli/utils": "^0.0.2-beta.14",
+        "@keroro-cli/utils": "workspace:*",
         "axios": "1.9.0",
+        "pacote": "^21.0.0",
         "pkg-dir": "^5.0.0",
+        "path-exists": "^4.0.0",
         "simple-git": "3.27.0"
     },
     "gitHead": "b9987d74b1536b96bf912354287553f15aa5d7ba"

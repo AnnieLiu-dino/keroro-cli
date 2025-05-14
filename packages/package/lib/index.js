@@ -70,7 +70,7 @@ class Package {
             this.storeDir,
             `_${prefix}@${version || this.pkgVersion}@${this.pkgName}`,
         )
-        logger.info('cacheFilePath', _p)
+        logger.info('cacheFilePath', _path)
         return _path
     }
 
@@ -80,20 +80,19 @@ class Package {
         if (this.storeDir) {
             // get lastest version 安装的时候可以用latest，但是查询的时候是以npm-name@x.x.x去找的
             await this.prepare()
-            return await pathExists(this.cacheFilePath)
-        } else {
-            logger.info('exists', 'this.storeDir 不存在')
-            // return pathExists(this.execRootDir)
+            const res = await pathExists(this.cacheFilePath())
+            logger.info('exists', res)
+            return res
         }
+        return false
     }
 
     // 安装package
     async install() {
         // 异步
         await this.prepare()
-        logger.notice(`正在下载${this.pkgName}@${this.pkgVersion}`)
-        const res = await this.pureInstall(this.pkgName, this.pkgVersion)
-        logger.notice(JSON.stringify(res))
+        logger.start(`正在下载${this.pkgName}@${this.pkgVersion}`)
+        await this.pureInstall(this.pkgName, this.pkgVersion)
     }
 
     // 更新package
@@ -110,32 +109,32 @@ class Package {
         const hasLatestPkg = await pathExists(pkgCachePath)
         logger.info('hasLatestPkg', hasLatestPkg)
 
+        const pkginfo = `${this.pkgName}@${lastestVersion}`
         if (hasLatestPkg) {
-            logger.notice(`当前已是最新版本：${this.pkgName}@${lastestVersion}`)
+            logger.success(`当前已是最新版本：${pkginfo}`)
         } else {
-            logger.notice(`正在更新${this.pkgName}@${lastestVersion}`)
+            logger.start(`正在更新模版：${pkginfo}`)
             await this.pureInstall(this.pkgName, lastestVersion)
+            logger.success('更新模版成功')
         }
         this.pkgVersion = lastestVersion
     }
 
     async pureInstall(name, version) {
-        console.log(name, version)
-        const res = await pacote.extract(
-            `${name}@${version}`,
-            path.resolve(this.execRootDir),
-            {
+        logger.info(this.cacheFilePath)
+        try {
+            logger.info('pureInstall', name, version)
+            const spec = `${name}@${version}`
+            const target = path.resolve(this.cacheFilePath(version))
+            logger.info('target', target)
+            const opts = {
                 registry: npmInfo.getDefaultRegistry(true),
-            },
-        )
-        // const res = await npminstall({
-        //     // 模块路径
-        //     root: this.execRootDir,
-        //     storeDir: this.storeDir,
-        //     registry: npmInfo.getDefaultRegistry(true),
-        //     pkgs: [{ name, version }],
-        // })
-        console.log(res)
+            }
+            await pacote.extract(spec, target, opts)
+            return true
+        } catch (err) {
+            return false
+        }
     }
 }
 

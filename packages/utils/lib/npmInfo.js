@@ -3,7 +3,7 @@
 const axios = require('axios')
 const urlJoin = require('url-join')
 const semver = require('semver')
-const { logger } = require('./log')
+const { logger } = require('./logger')
 
 const DEFAULT_REGISTRY = 'https://registry.npmjs.org'
 
@@ -22,7 +22,7 @@ async function getNpmPkgInfo(npmName, registry = DEFAULT_REGISTRY) {
             return data
         }
     } catch (e) {
-        console.error(e.message)
+        logger.error(e.message)
         return null
     }
 }

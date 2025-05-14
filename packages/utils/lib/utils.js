@@ -37,7 +37,7 @@ function exec_script(command, args, options = {}) {
 
 async function execAsync(command, args, options = {}) {
     return new Promise((resolve, reject) => {
-        const p = exec_script(command, args, (options = {}))
+        const p = exec_script(command, args, options)
         // 对 p 的状态进行监听
         p.on('error', (e) => {
             reject(e)

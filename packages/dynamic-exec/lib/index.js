@@ -29,6 +29,7 @@ async function exec() {
             version: pkgVersion,
         })
         const hasPkgInLocal = await pkg.exists()
+        logger.info('hasPkgInLocal', hasPkgInLocal)
         if (hasPkgInLocal) {
             await pkg.update()
         } else {

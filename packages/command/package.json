@@ -28,7 +28,7 @@
         "url": "https://github.com/AnnieLiu-dino/keroro-cli/issues"
     },
     "dependencies": {
-        "@keroro-cli/utils": "^0.0.2-beta.14",
+        "@keroro-cli/utils": "workspace:*",
         "semver": "^7.3.5"
     },
     "gitHead": "3bb47ec84c4ec1817e93dfb86c8a536b41f64adc"

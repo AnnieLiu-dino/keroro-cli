@@ -25,8 +25,8 @@
         "registry": "https://registry.npmjs.org/"
     },
     "dependencies": {
-        "@keroro-cli/dynamic-exec": "^0.0.1-beta.22",
-        "@keroro-cli/utils": "^0.0.2-beta.14",
+        "@keroro-cli/dynamic-exec": "workspace:*",
+        "@keroro-cli/utils": "workspace:*",
         "commander": "^8.0.0",
         "dotenv": "^16.4.7",
         "import-local": "^3.2.0",
