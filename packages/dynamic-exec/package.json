@@ -1,6 +1,6 @@
 {
     "name": "@keroro-cli/dynamic-exec",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "动态执行命令",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
     "homepage": "https://github.com/AnnieLiu-dino/keroro-cli#readme",
