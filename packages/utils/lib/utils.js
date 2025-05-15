@@ -1,4 +1,5 @@
 const path = require('path')
+const { spawn } = require('child_process')
 
 // 兼容window/mac的路径: 保证路径里都是 /
 function formatPath(_path) {
@@ -23,28 +24,40 @@ function sleep(ms = 1000) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-function exec_script(command, args, options = {}) {
+function execScript(command, args = [], options = {}) {
     const isWin32 = process.platform === 'win32'
-
     const cmd = isWin32 ? 'cmd' : command
-    const comnArgs = isWin32 ? ['/c'].concat(command, args) : args
-    console.log('cmd, comnArgs', cmd, comnArgs)
-    // 在window下应该是：child_process.spawn('cmd', ['/c', 'node','-e', exec_code], PS：window多个cmd的前缀
-    // 在Mac下： child_process.spawn('node', ['-e', exec_code]
-    const child = require('child_process').spawn(cmd, comnArgs, options)
-    return child
-}
+    const cmdArgs = isWin32 ? ['/c', command, ...args] : args
 
-async function execAsync(command, args, options = {}) {
+    // spawn('npm', ['install'], { cwd: '目标路径' })
+    // spawn('cmd', ['/c', 'npm', 'install'], { cwd: '目标路径' })
+
+    // /c 表示执行完命令后关闭 shell。
+
+    // spawn('cmd', ['/c', 'node', '-e', exec_code], PS：window多个cmd的前缀
+    // spawn('node', ['-e', exec_code]
     return new Promise((resolve, reject) => {
-        const p = exec_script(command, args, options)
-        // 对 p 的状态进行监听
-        p.on('error', (e) => {
-            reject(e)
+        const child = spawn(cmd, cmdArgs, {
+            cwd: options.cwd || process.cwd(),
+            stdio: options.stdio || 'inherit', // 默认直接继承父进程输出
+            shell: options.shell || false,
+            env: Object.assign({}, process.env, options.env || {}),
         })
 
-        p.on('exit', (r) => {
-            resolve(r)
+        child.on('error', (err) => {
+            reject(err)
+        })
+
+        child.on('close', (code) => {
+            if (code !== 0) {
+                reject(
+                    new Error(
+                        `Command failed: ${command} ${args.join(' ')}\nExit code: ${code}`,
+                    ),
+                )
+            } else {
+                resolve(code)
+            }
         })
     })
 }
@@ -53,5 +66,5 @@ module.exports = {
     isObject,
     formatPath,
     sleep,
-    execAsync,
+    execScript,
 }

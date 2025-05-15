@@ -5,10 +5,9 @@ const os = require('os')
 const ejs = require('ejs')
 const { glob } = require('glob')
 
-const { logger } = require('@keroro-cli/utils')
+const { logger, utils } = require('@keroro-cli/utils')
 const Command = require('@keroro-cli/command')
 const Package = require('@keroro-cli/package')
-const { utils } = require('@keroro-cli/utils')
 const {
     askIsContinue,
     askIsClearDir,
@@ -16,32 +15,68 @@ const {
     askProjectInfo,
 } = require('./inquirer')
 
-const { getProjectTempaltes, getComponentTempaltes } = require('./server')
-const { stringify } = require('querystring')
+const { getProjectTempaltes } = require('./server')
 const userHomeDir = os.homedir()
 
 const WHITE_COMMAND = ['npm', 'yarn', 'cnpm']
 
-function create(argv) {
-    console.log('argv', argv)
-    const instance = new CreateCommand(argv)
-    return instance
-}
-
 class CreateCommand extends Command {
     templateInfo = {}
     force = false
-    projectInfo = {}
+    userProjectInfo = {}
     constructor(argv) {
         super(argv)
-        // cwd/pwd 当前进程运行所在的文件夹，例如在：/annie/test 运行，结果是：/annie/test
         this.cwd = process.cwd() || path.resolve('.')
     }
 
     // 如果不实现initial，父类中会报错
     initial() {
-        const { force } = this._options
+        const { force } = this._commandOptions
         this.force = force
+    }
+
+    async execute() {
+        try {
+            await this.prepare()
+            await this.downloadTemplate()
+            await this.installTemplate()
+        } catch (e) {
+            logger.error('CreateCommand', e.message)
+        }
+    }
+
+    async prepare() {
+        // 0、判断项目模版是否存在
+        const projectTemplates = await getProjectTempaltes()
+        this.projectTemplates = projectTemplates
+        if (!projectTemplates || projectTemplates.length === 0) {
+            throw new Error('项目模版不存在')
+        }
+        // 1、判断当前目录是否为空
+        // 如果目录里只有 .文件 和 node_modules 目录，算是空目录
+        const isDirEmpty = this._isDirEmpty()
+        logger.info(this.constructor.name, '当前执行目录是否为空', isDirEmpty)
+
+        let isContinue = false
+        // 若是 force：false，询问用户是否继续创建项目; force：true，无需在过问那么多条件
+
+        // 非空就要去询问用户操作
+        if (!isDirEmpty) {
+            if (!this.force) {
+                // 询问是否创建
+                isContinue = await askIsContinue()
+                if (!isContinue) process.exit(1)
+            }
+            if (isContinue || this.force) {
+                // 2、是否启动强制更新
+                const isClearDir = await askIsClearDir()
+                if (isClearDir) fs.emptyDirSync(this.cwd)
+            }
+        }
+        // 3、选择创建项目
+        // 4、获取用户项目基本信息
+        const projectInfo = await this.getUserProjectInfo()
+        return projectInfo
     }
 
     get projectTemplateChoices() {
@@ -51,92 +86,31 @@ class CreateCommand extends Command {
         }))
     }
 
-    async execute() {
-        try {
-            // 1.准备阶段
-            const result = await this._prepare()
-            if (!result) {
-                logger.info('创建项目终止')
-                return
-            }
-            // 2.下载模版
-            await this._downloadTemplate()
-            // 3.安装模版
-            await this._installTemplate()
-        } catch (e) {
-            logger.error(
-                'has error happend in execute stage for command-create',
-                e.message,
-            )
-        }
-    }
-
-    async _prepare() {
-        // 0、判断项目模版是否存在
-        const projectTemplates = await getProjectTempaltes()
-        console.log('project', projectTemplates)
-        // TODO: 组件逻辑
-        const componentTemplates = await getComponentTempaltes()
-
-        this.projectTemplates = projectTemplates
-        if (!projectTemplates || projectTemplates.length === 0) {
-            throw new Error('项目模版不存在')
-        }
-        // 1、判断当前目录是否为空
-        // 如果目录里只有 .文件 和 node_modules 目录，算是空目录
-        const isDirEmpty = this._isDirEmpty()
-        logger.info(this.constructor.name, '当前执行目录是否为空', isDirEmpty)
-        let isContinue = false
-        // 若是 force：false，询问用户是否继续创建项目
-        // 若是 force：true，无需在过问那么多条件
-
-        // 非空就要去询问用户操作
-        if (!isDirEmpty) {
-            if (!this.force) {
-                // 询问是否创建
-                isContinue = await askIsContinue()
-                if (!isContinue) {
-                    return
-                }
-            }
-            if (isContinue || this.force) {
-                // 2、是否启动强制更新
-                const isClearDir = await askIsClearDir()
-                if (isClearDir) fs.emptyDirSync(this.cwd)
-            }
-        }
-        // 3、选择创建项目/组件
-        // 4、获取项目基本信息
-        const projectInfo = await this.getProjectInfo()
-        return projectInfo
-    }
-
-    async getProjectInfo() {
-        let projectInfo = {}
+    async getUserProjectInfo() {
+        let userProjectInfo = {}
         // 3、选择创建项目/组件
         const projectType = await askProjectType()
         switch (projectType) {
             case 'project':
                 // 4、获取项目的基本信息
                 const info = await askProjectInfo(this.projectTemplateChoices)
-                projectInfo = {
+                userProjectInfo = {
                     projectType,
                     ...info,
                 }
-                this.projectInfo = projectInfo
+                this.userProjectInfo = userProjectInfo
                 break
-            case 'component':
-                break
+            // case 'other':
+            //     break
         }
-        return this.projectInfo
+        return this.userProjectInfo
     }
 
     _isDirEmpty() {
-        logger.info(this.constructor.name, '当前的执行目录', this.cwd)
         // 读出所有的文件列表
         let fileList = fs.readdirSync(this.cwd)
         fileList = fileList.filter((filename) => {
-            // 过滤掉隐藏文件和node_modules
+            // 过滤掉 隐藏文件 和 node_modules
             return (
                 !filename.startsWith('.') &&
                 ['node_modules'].indexOf(filename) < 0
@@ -147,11 +121,11 @@ class CreateCommand extends Command {
     }
 
     // 先把文件下载到缓存目录
-    async _downloadTemplate() {
+    async downloadTemplate() {
         // 在缓存目录下创建template文件夹
         const targetPath = path.resolve(userHomeDir, '.keroro-cli', 'templates')
         const storeDir = path.resolve(targetPath, 'node_modules')
-        const { projectTemplateName } = this.projectInfo
+        const { projectTemplateName } = this.userProjectInfo
         this.templateInfo = this.projectTemplates.find(
             (item) => item.npmName === projectTemplateName,
         )
@@ -193,10 +167,10 @@ class CreateCommand extends Command {
     }
 
     // 将已经缓存的模版进行安装
-    async _installTemplate() {
+    async installTemplate() {
         if (!this.templateInfo) throw new Error('没有模版信息，try again')
         const { type = 'normal', npmName, version } = this.templateInfo
-        await this._installNormalTemplate()
+        await this.installNormalTemplate()
     }
     // 添加白名单
     checkCommand(command) {
@@ -207,17 +181,14 @@ class CreateCommand extends Command {
     }
 
     async execCommand(command, errMsg) {
-        if (!command) throw new Error('command')
+        if (!command) throw new Error('command 无效')
         const script = command.split(' ')
         const cmd = this.checkCommand(script[0])
         if (!cmd) throw new Error(`命令不存在 ${cmd}`)
 
         const args = script.slice(1)
         try {
-            const res = await utils.execAsync(cmd, args, {
-                stdio: 'inherit',
-                cwd: process.cwd(),
-            })
+            const res = await utils.execScript(cmd, args)
             if (res !== 0) {
                 throw new Error(errMsg)
             }
@@ -226,7 +197,7 @@ class CreateCommand extends Command {
         }
     }
 
-    async _installNormalTemplate() {
+    async installNormalTemplate() {
         logger.info(
             '_installNormalTemplate',
             this.templateNpmPkg.cacheFilePath(),
@@ -267,12 +238,8 @@ class CreateCommand extends Command {
         await this.execCommand(start, '启动命令失败')
     }
 
-    async _installCustomTemplate() {
-        console.log(this.templateInfo)
-    }
-
     async ejsRender(option) {
-        const { projectName, projectVersion } = this.projectInfo
+        const { projectName, projectVersion } = this.userProjectInfo
         // <%= app.name%>
         const tempalteData = {
             app: { name: projectName, version: projectVersion },
@@ -304,4 +271,10 @@ class CreateCommand extends Command {
     }
 }
 
+function create(argv) {
+    console.log('argv', argv)
+    const instance = new CreateCommand(argv)
+    instance.run()
+    return instance
+}
 module.exports = create

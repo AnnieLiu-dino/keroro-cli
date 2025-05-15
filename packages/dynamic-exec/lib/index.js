@@ -1,9 +1,8 @@
 'use strict'
 
 const path = require('path')
-const child_process = require('child_process')
-const { logger } = require('@keroro-cli/utils')
-const Package = require('../../package/lib')
+const { logger, utils } = require('@keroro-cli/utils')
+const Package = require('@keroro-cli/package')
 
 // 配置表：key: 命令名称，value: npm包名称
 const SETTING = {
@@ -33,7 +32,14 @@ async function exec() {
         if (hasPkgInLocal) {
             await pkg.update()
         } else {
-            await pkg.install()
+            try {
+                await pkg.install()
+                await utils.execScript('npm', ['install'], {
+                    cwd: pkg.cacheFilePath(),
+                })
+            } catch (e) {
+                logger.error(e)
+            }
         }
     } else {
         // 指定文件：cmdLocalPath 去执行
@@ -48,56 +54,18 @@ async function exec() {
     logger.info('entryFilePath', pkgEntryFilePath)
     if (pkgEntryFilePath) {
         try {
-            // // 在当前进程中调用：无法充分利用cpu资源
-            // // 将对象转数组 Array.from(arguments)
-            // require(entryFile).call(null, Array.from(arguments))
-
-            // 在node 子进程中调用，额外获得cpu资源
-            //使用多进程去执行
-            const options = this.opts()
-            const args = [commandName, options]
+            const args = [commandName, this.opts()]
             // 1. 先将命令行参数转成字符串
-            const exec_code = `require('${pkgEntryFilePath}').call(null, ${JSON.stringify(
+            const code = `require('${pkgEntryFilePath}').call(null, ${JSON.stringify(
                 args,
             )})`
-            logger.info(exec_code)
-
-            const child = spawn(exec_code, {
-                cwd: process.cwd(),
-                stdio: 'inherit', // pipe inherit ignore 的区别
-            })
-            // 2. 监听子进程的输出
-            child.on('error', (e) => {
-                logger.error(e.message)
-                // 结束
-                process.exit(1)
-            })
-            // 3. 退出事件
-            child.on('exit', (code) => {
-                logger.debug('命令执行结束', code)
-                process.exit(code)
-            })
+            //使用多进程去执行
+            await utils.execScript('node', ['-e', code])
         } catch (e) {
             logger.error(e.message)
+            process.exit(1)
         }
     }
-}
-
-// 兼容MAC和WINDOWS
-function spawn(exec_code, options) {
-    const isWin32 = process.platform === 'win32'
-    const command = isWin32 ? 'cmd' : 'node'
-    const comnArgs = ['-e', exec_code]
-    const args = isWin32 ? ['/c'].concat(comnArgs) : comnArgs
-    // window下：
-    // child_process.spawn('cmd', ['/c', 'node','-e', exec_code], PS：window多个cmd的前缀
-
-    // Mac下：
-    // child_process.spawn('node', ['-e', exec_code]
-    const child = child_process.spawn(command, args, {
-        ...options,
-    })
-    return child
 }
 
 module.exports = exec

@@ -36,9 +36,11 @@ class Package {
     _getRootFile(dirPath) {
         // 1. 获取package.json所在目录
         const dir = pkgDir(dirPath)
+        logger.info('dir', dir)
         if (dir) {
             // 2. 读取package.json
             const pkgFile = require(path.resolve(dir, 'package.json'))
+            logger.info('pkgFile', pkgFile.main)
             // 3. 寻找main/lib
             if (pkgFile && pkgFile.main) {
                 // 4. 路径的兼容(macOS/windows)
@@ -55,10 +57,13 @@ class Package {
     // 获取入口文件路径(逐层向上查找package.json所在层级)
     // execRootDir 路径下的入口文件（一般是 package.json 里面 "main" 指向的 js 文件）
     getEntryFilePath() {
+        logger.info('getEntryFilePath', 'this.storeDir', this.storeDir)
         // 如果有缓存文件夹，就去缓存文件夹去找执行文件
         if (this.storeDir) {
-            return this._getRootFile(this.cachePkgDir)
+            logger.info('this.cachePkgDir', this.cacheFilePath())
+            return this._getRootFile(this.cacheFilePath())
         } else {
+            logger.info('this.execRootDir', this.execRootDir)
             // 反之去找 指定文件夹中的入口文件, 进入本地调试模式
             return this._getRootFile(this.execRootDir)
         }
@@ -121,7 +126,7 @@ class Package {
     }
 
     async pureInstall(name, version) {
-        logger.info(this.cacheFilePath)
+        logger.info('pureInstall', this.cacheFilePath())
         try {
             logger.info('pureInstall', name, version)
             const spec = `${name}@${version}`
