@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.2](https://github.com/AnnieLiu-dino/keroro-cli/compare/@keroro-cli/dynamic-exec@0.0.1...@keroro-cli/dynamic-exec@0.0.2) (2025-05-15)
+
+### Bug Fixes
+
+- **npminstall:** refactor npminstall process ([4c44727](https://github.com/AnnieLiu-dino/keroro-cli/commit/4c44727b771de8f2fb3001d7424b4952194880e4))
+
 ## 0.0.1 (2025-05-14)
 
 ### Bug Fixes

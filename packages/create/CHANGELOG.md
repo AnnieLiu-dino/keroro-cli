@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://github.com/AnnieLiu-dino/keroro-cli/compare/@keroro-cli/create@1.0.0...@keroro-cli/create@1.0.1) (2025-05-15)
+
+### Bug Fixes
+
+- **npminstall:** refactor npminstall process ([4c44727](https://github.com/AnnieLiu-dino/keroro-cli/commit/4c44727b771de8f2fb3001d7424b4952194880e4))
+
 # 1.0.0 (2025-05-14)
 
 ### Bug Fixes
