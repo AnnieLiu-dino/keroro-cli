@@ -4,6 +4,7 @@
     "packages": ["packages/*"],
     "command": {
         "publish": {
+            "updateInternalDependencies": "version",
             "conventionalCommits": true,
             "ignoreChanges": ["**/*.md", "*.md"],
             "allowBranch": "master"
