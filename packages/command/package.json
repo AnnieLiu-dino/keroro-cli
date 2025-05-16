@@ -7,7 +7,7 @@
     "license": "ISC",
     "main": "lib/index.js",
     "engines": {
-        "node": ">=14"
+        "node": ">=18"
     },
     "directories": {
         "lib": "lib",
