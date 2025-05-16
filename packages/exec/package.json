@@ -1,5 +1,5 @@
 {
-    "name": "@keroro-cli/dynamic-exec",
+    "name": "@keroro-cli/exec",
     "version": "0.0.3",
     "description": "动态执行命令",
     "author": "AnneLiu <anne.liu0825@gmail.com>",
@@ -9,6 +9,9 @@
     "directories": {
         "lib": "lib",
         "test": "__tests__"
+    },
+    "engines": {
+        "node": ">=14"
     },
     "files": [
         "lib"

@@ -3,7 +3,11 @@
     "version": "1.0.0",
     "license": "ISC",
     "private": true,
+    "engines": {
+        "node": ">=14.0.0"
+    },
     "scripts": {
+        "publish": "pnpm public -r",
         "release:beta": "npx lerna publish --canary --preid beta --dist-tag beta --message 'chore(release): beta publish'",
         "release:stable": "npx lerna publish --message 'chore(release): stable publish'",
         "format": "prettier --write \"packages/**/*.{js,ts,jsx,tsx,json,md}\"",

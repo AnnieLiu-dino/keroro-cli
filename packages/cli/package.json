@@ -13,6 +13,9 @@
     "bin": {
         "keroro-cli": "bin/index.js"
     },
+    "engines": {
+        "node": ">=14"
+    },
     "directories": {
         "lib": "lib",
         "test": "__tests__"
@@ -25,7 +28,7 @@
         "registry": "https://registry.npmjs.org/"
     },
     "dependencies": {
-        "@keroro-cli/dynamic-exec": "workspace:*",
+        "@keroro-cli/exec": "workspace:*",
         "@keroro-cli/utils": "workspace:*",
         "commander": "^8.0.0",
         "dotenv": "^16.4.7",

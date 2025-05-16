@@ -30,9 +30,9 @@ importers:
 
   packages/cli:
     dependencies:
-      '@keroro-cli/dynamic-exec':
+      '@keroro-cli/exec':
         specifier: workspace:*
-        version: link:../dynamic-exec
+        version: link:../exec
       '@keroro-cli/utils':
         specifier: workspace:*
         version: link:../utils
@@ -82,7 +82,7 @@ importers:
         specifier: ^10.3.10
         version: 10.4.5
 
-  packages/dynamic-exec:
+  packages/exec:
     dependencies:
       '@keroro-cli/package':
         specifier: workspace:*

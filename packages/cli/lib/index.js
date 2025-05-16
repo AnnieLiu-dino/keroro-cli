@@ -2,7 +2,7 @@
 
 const commander = require('commander')
 const { logger } = require('@keroro-cli/utils')
-const dynamicExec = require('@keroro-cli/dynamic-exec')
+const exec = require('@keroro-cli/exec')
 const pkg = require('../package.json')
 const check = require('./check')
 
@@ -42,7 +42,7 @@ function registerCommand() {
     create
         .option('-f, --force', 'Force project creation')
         .description('Create a new project')
-        .action(dynamicExec)
+        .action(exec)
 
     // Listen for --cmdLocalPath option
     program.on('option:cmdLocalPath', function () {

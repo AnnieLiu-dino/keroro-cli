@@ -4,45 +4,54 @@ const path = require('path')
 const { logger, utils } = require('@keroro-cli/utils')
 const Package = require('@keroro-cli/package')
 
-// 配置表：key: 命令名称，value: npm包名称
-const SETTING = {
+// Command-to-package mapping: key = command name, value = npm package name
+const commandMap = {
     create: '@keroro-cli/create',
 }
 
 async function exec() {
     const envPath = process.env.KERORO_CLI_ENV_PATH
     let pkg
-    // this = create command program
     const commandName = this.name()
-    const pkgName = SETTING[commandName]
+    const pkgName = commandMap[commandName]
     const pkgVersion = 'latest'
 
-    // 没有指定文件，就下载对应的 npm package
+    // If no local command path is specified, install the corresponding npm package
     if (!process.env.KERORO_CLI_CMD_LOCAL_PATH) {
         const execRootDir = path.resolve(envPath, 'dependencies/')
         const storeDir = path.resolve(execRootDir, 'node_modules')
+
         pkg = new Package({
             execRootDir,
             storeDir,
             name: pkgName,
             version: pkgVersion,
         })
+
         const hasPkgInLocal = await pkg.exists()
-        logger.info('hasPkgInLocal', hasPkgInLocal)
+        logger.info('Package exists locally:', hasPkgInLocal)
+
         if (hasPkgInLocal) {
-            await pkg.update()
+            const needInstall = await pkg.update()
+            if (needInstall) {
+                logger.start('Installing dependencies...')
+                await utils.execScript('npm', ['install'], {
+                    cwd: pkg.cacheFilePath(),
+                })
+            }
         } else {
             try {
+                logger.start('Installing package...')
                 await pkg.install()
                 await utils.execScript('npm', ['install'], {
                     cwd: pkg.cacheFilePath(),
                 })
             } catch (e) {
-                logger.error(e)
+                logger.error('Package installation failed:', e)
             }
         }
     } else {
-        // 指定文件：cmdLocalPath 去执行
+        // If local command path is specified, use that
         pkg = new Package({
             execRootDir: process.env.KERORO_CLI_CMD_LOCAL_PATH,
             name: pkgName,
@@ -51,18 +60,16 @@ async function exec() {
     }
 
     const pkgEntryFilePath = pkg.getEntryFilePath()
-    logger.info('entryFilePath', pkgEntryFilePath)
+    logger.info('Package entry file path:', pkgEntryFilePath)
+
     if (pkgEntryFilePath) {
         try {
             const args = [commandName, this.opts()]
-            // 1. 先将命令行参数转成字符串
-            const code = `require('${pkgEntryFilePath}').call(null, ${JSON.stringify(
-                args,
-            )})`
-            //使用多进程去执行
+            const code = `require('${pkgEntryFilePath}').call(null, ${JSON.stringify(args)})`
+            // Execute in a new Node.js subprocess
             await utils.execScript('node', ['-e', code])
         } catch (e) {
-            logger.error(e.message)
+            logger.error('Failed to execute package:', e.message)
             process.exit(1)
         }
     }

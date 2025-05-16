@@ -1,4 +1,4 @@
-# `@keroro-cli/dynamic-exec`
+# `@keroro-cli/exec`
 
 > TODO: description
 

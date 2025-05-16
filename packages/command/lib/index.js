@@ -3,7 +3,7 @@
 const semver = require('semver')
 const { logger } = require('@keroro-cli/utils')
 
-const LOWEST_NODE_VERSION = '12.0.0'
+const LOWEST_NODE_VERSION = '14.0.0'
 
 class Command {
     _argv
