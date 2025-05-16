@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.5](https://github.com/AnnieLiu-dino/keroro-cli/compare/@keroro-cli/utils@0.0.4...@keroro-cli/utils@0.0.5) (2025-05-16)
+
+**Note:** Version bump only for package @keroro-cli/utils
+
 ## 0.0.4 (2025-05-15)
 
 ### Bug Fixes
